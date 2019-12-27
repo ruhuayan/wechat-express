@@ -1,19 +1,93 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width">
-  <title>{{title }}</title>
-  <link rel="stylesheet" href="/css/style.css">
-  {{#if ENV_DEVELOPMENT}}
-    <script src="http://localhost:35729/livereload.js"></script>
-  {{/if}}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>{{title}}-海运拼箱</title>
+    <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.3/weui.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    {{#if ENV_DEVELOPMENT}}
+        <script src="http://localhost:35729/livereload.js"></script>
+    {{/if}}
 </head>
 <body>
-
+  <header>
+    <div class="mainMenuBtn">
+        <a href="/wechat/" class="menu__icon">
+            <img src="/img/mainMenu.svg" alt="包裹登记" >
+        </a>
+    </div>
+    <div class="logo">{{title}} - 海运拼箱</div>
+    <div class="userLogo">
+        <a href="javascript:;" class="menu__icon">
+            <img src="/img/account.svg" alt="会员中心" >
+        </a>
+    </div>
+  </header>
 
   {{{body}}}
 
+  <div class="weui-footer weui-footer_fixed-bottom">
+        <p class="weui-footer__links">
+            <a href="javascript:home();" class="weui-footer__link">海运拼箱</a>
+        </p>
+        <p class="weui-footer__text">Copyright © 2019-2020 richyan.com</p>
+  </div>
 
+    {{#if signPackage}}
+        <script src="/js/jweixin-1.4.0.js"></script>
+        <script>
+            var signPackage = {{{signPackage}}};
+        
+            wx.config({
+                debug: true,
+                appId: signPackage.appId,
+                timestamp: signPackage.timestamp,
+                nonceStr: signPackage.nonceStr,
+                signature: signPackage.signature,
+                jsApiList: [
+                    'onMenuShareTimeline',
+                    'onMenuShareAppMessage',
+                    'scanQRCode'
+                ]
+            });
+
+            wx.ready(function () {
+                console.log('wx.ready');
+                wx.onMenuShareTimeline({
+                    title: '海运拼箱 网页', // 分享标题
+                    link: window.location.href, // 分享链接
+                    imgUrl: '',
+                    success: function () {
+                        console.log('share success');
+                    },
+                    cancel: function () {
+                        console.log('share cancel');
+                    }
+                });
+                wx.onMenuShareAppMessage({
+                    title: '海运拼箱 微信', // 分享标题
+                    link: window.location.href, // 分享链接
+                    imgUrl: '',
+                    success: function () {
+                        console.log('share success');
+                    },
+                    cancel: function () {
+                        console.log('share cancel');
+                    }
+                });
+            });
+        
+            function scan () {
+                wx.scanQRCode({
+                    needResult: 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
+                    scanType: ["qrCode","barCode"], // 可以指定扫二维码还是一维码，默认二者都有
+                    success: function (res) {
+                        var result = res.resultStr; // 当needResult 为 1 时，扫码返回的结果
+                    }
+                });
+            }
+        </script>
+    {{/if}}
   </body>
 </html>

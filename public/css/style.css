@@ -1,0 +1,71 @@
+body {
+  padding: 50px 0px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif; }
+
+a {
+  color: #00B7FF; }
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  background-color: #1aad19;
+  color: #fff;
+  box-shadow: 0 2px 5px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.12);
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 0px;
+  font-weight: bold;
+  font-size: 1rem; }
+
+.page__hd {
+  padding: 40px; }
+
+.page__content .weui-grid__label {
+  color: #1aad19; }
+
+a.menu__icon {
+  margin-left: 10px;
+  margin-right: 10px; }
+  a.menu__icon img {
+    width: 24px;
+    height: 24px; }
+
+.register_parcel-form {
+  width: 90%;
+  margin: auto;
+  padding-top: 24px; }
+  .register_parcel-form .weui-form__text-area {
+    text-align: center; }
+  .register_parcel-form .weui-form__control-area {
+    margin: 24px 0; }
+  .register_parcel-form .weui-label {
+    width: 55px; }
+  .register_parcel-form .weui-form__opr-area .weui-btn {
+    margin: 1rem; }
+  .register_parcel-form .weui-cell__ft {
+    text-align: center; }
+    .register_parcel-form .weui-cell__ft .weui-label {
+      font-size: 17px;
+      font-weight: bold; }
+    .register_parcel-form .weui-cell__ft .weui-btn {
+      font-size: 16px;
+      padding: 0 12px;
+      margin-left: 0;
+      height: auto;
+      width: auto;
+      line-height: 2em;
+      background: transparent; }
+
+.parcel-search .weui-search-bar {
+  background: #fff; }
+  .parcel-search .weui-search-bar::before {
+    border: none; }
+
+.parcel-search .weui-search-bar__label {
+  line-height: 1.42857143em; }
+
+.parcel-search .searchbar-result {
+  display: none; }

@@ -1,8 +1,93 @@
+// @import '/node_modules/weui/dist/style/weui.min.css';
+$themeColor: #1aad19;
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+    padding: 50px 0px;
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 a {
-  color: #00B7FF;
+    color: #00B7FF;
+}
+
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    background-color: $themeColor;
+    color: #fff;
+    box-shadow: 0 2px 5px 1px rgba(0,0,0,.14), 0 3px 14px 2px rgba(0,0,0,.12), 0 5px 5px -3px rgba(0,0,0,.12);
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 0px;
+    font-weight: bold;
+    font-size: 1rem;
+    // >div {
+    //   width: 33%;
+    // }
+}
+.page__hd {
+    padding: 40px;
+}
+.page__content .weui-grid__label {
+    color: $themeColor;
+}
+
+a.menu__icon {
+    margin-left: 10px;
+    margin-right: 10px;
+    img {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+.register_parcel-form {
+    width: 90%;
+    margin: auto;
+    padding-top: 24px;
+    .weui-form__text-area {
+        text-align: center;
+    }
+    .weui-form__control-area {
+        margin: 24px 0;
+    }
+    .weui-label {
+        width: 55px;
+    }
+    .weui-form__opr-area .weui-btn {
+        margin: 1rem;
+    }
+    .weui-cell__ft {
+        text-align: center;
+        .weui-label {
+            font-size: 17px;
+            font-weight: bold;
+        }
+        .weui-btn {
+            font-size: 16px;
+            padding: 0 12px;
+            margin-left: 0;
+            height: auto;
+            width: auto;
+            line-height: 2em;
+            background: transparent;
+        }
+    }
+}
+
+.parcel-search {
+    .weui-search-bar {
+        &::before {
+            border: none;
+        }
+        background: #fff;
+    }
+    .weui-search-bar__label {
+        line-height: 1.42857143em;
+    }
+    .searchbar-result {
+        display: none;
+    }
 }
