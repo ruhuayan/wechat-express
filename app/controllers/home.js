@@ -39,16 +39,9 @@ const handleWechatTextMessage = (req, res, next) => {
 
     msg.save((e, msg) => {
         if (e) {
-            return console.error('conversion save error:', e);
+            return console.error('message save error:', e);
         }
         console.log(msg)
-        // 更新会话次数
-        req.user.messageCount = req.user.messageCount + 1;
-        req.user.save(function (_e, u) {
-            if (_e) {
-                return console.error('user conversation stats save error:', _e);
-            }
-        });
     });
     return res.reply(message.Content);
 };
@@ -106,8 +99,7 @@ const handleUserSync = (req, res, next) => {
 
         console.log(`create new user: ${openid}`);
         const newUser = new User({
-            openid,
-            messageCount: 0,
+            openid
         });
 
         newUser.save(function (e, u) {

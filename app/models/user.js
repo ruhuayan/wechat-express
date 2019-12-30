@@ -1,14 +1,15 @@
-var mongoose = require('mongoose'),
-    Schema = mongoose.Schema;
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-var UserSchema = new Schema({
-    openid: { type: Schema.Types.ObjectId, required: '`openid`是必填参数' },
-    name: { type: String},
-    address: [{type: String}],
-    
+const UserSchema = new Schema({
+    openid: { type: String, required: '`openid`是必填参数', unique: true },
+    name: { type: String, maxlength: 100 },
+    addresses: [{type: Schema.ObjectId, ref: 'Address'}],
+    phone: {type: String, validate: {validator: v => /\d{3}-\d{3}-\d{4}/.test(v), message: props => `${props.value} 不符电话格式 xxx-xxx-xxxx` }},
+    email: {type: String, validate: {validator: v => /\S+@\S+\.\S+/.test(v), message: props => `${props.value} 不符 email 格式` }}, 
     // createdAt: { type: Date, default: Date.now },
-    messageCount: { type: Number, default: 0 },
 });
+
 UserSchema.set('timestamps', true);
 mongoose.model('User', UserSchema);
 
