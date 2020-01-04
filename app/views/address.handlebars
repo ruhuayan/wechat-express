@@ -1,0 +1,194 @@
+{{#section 'style'}}
+<style>
+    .weui-form {
+        width: 96%;
+        margin: auto;
+        padding-top: 24px;
+    }
+    .weui-form__text-area {
+        text-align: center;
+    }
+    .weui-form__control-area {
+        margin: 12px 0;
+    }
+    
+    .weui-form__opr-area {
+        text-align: right;
+        padding-right: 15px;
+    }
+    .weui-cell__hd label {
+        width: 50px;
+    }
+    input.weui-input.error {
+        border: 1px solid red;
+    }
+    .weui-icon-success {
+        display: none;
+        font-size: 20px;
+        color: #00B7FF;
+    }
+    .weui-check:checked + .weui-icon-success {
+        display: block;
+    }
+    .weui-cells.address-form {
+        margin-top: 0;
+    }
+    .add-address::before {
+        content: '-';
+        margin-right: 5px;
+    }
+    .add-address.plus::before {
+        content: '+';
+    }
+</style>
+{{/section}}
+<div class="weui-form">
+    <div class="weui-form__text-area">
+        <h2 class="weui-form__title">{{title}}</h2>
+        <div class="weui-form__desc"></div>
+    </div>
+    <div class="weui-form__control-area">
+        <div class="weui-cells__group weui-cells__group_form">
+            {{#unless order.address}}
+                <div class="weui-panel__bd">
+                    {{#each addresses}}
+                    <label class="weui-media-box weui-media-box_appmsg address-box" for="x1{{@index}}">
+                        <div class="weui-media-box__bd">
+                            <h4 class="weui-media-box__title">地址 {{@index}}</h4>
+                            <p class="weui-media-box__desc">{{street}}</p>
+                            <p class="weui-media-box__desc">Qc, Canada</p>
+                            <p class="weui-media-box__desc">{{postal}}</p>
+                        </div>
+                        <div class="weui-media-box__ft">
+                            <input type="radio" name="radio1" class="weui-check" id="x1{{@index}}" checked="checked" data-id="{{_id}}">
+                            <i class="weui-icon-success weui-icon_msg"></i>
+                        </div>
+                    </label>
+                    {{/each}}
+                    {{#if addresses}}
+                    <div class="weui-cell">
+                        <a class="add-address plus">添加地址</a>
+                    </div>
+                    {{/if}}
+                </div>
+            {{/unless}}
+            <div class="weui-cells weui-cells_form address-form {{#unless order.address}}{{#if addresses}}display-none{{/if}}{{/unless}}"
+                {{#if order.address}}data-id="{{order.address._id}}"{{/if}}>
+                {{!-- <div class="weui-cell">
+                    <div class="weui-cell__hd"><label class="weui-label">姓名:</label></div>
+                    <div class="weui-cell__bd">
+                        <input class="weui-input name" placeholder="Name (姓名)" {{#if order.user}}value="{{order.user._id}}"{{/if}} required>
+                    </div>
+                </div>
+                <div class="weui-cell">
+                    <div class="weui-cell__hd"><label class="weui-label">电话:</label></div>
+                    <div class="weui-cell__bd">
+                        <input class="weui-input phone" placeholder="Phone (电话)" {{#if order.phone}}value="{{order.phone}}"{{/if}}>
+                    </div>
+                </div> --}}
+                <div class="weui-cell">
+                    <div class="weui-cell__hd"><label class="weui-label">街道:</label></div>
+                    <div class="weui-cell__bd">
+                        <input class="weui-input street" placeholder="Street (街道)"
+                            {{#if order.address}}value="{{order.address.street}}" disabled{{/if}}>
+                    </div>
+                </div>
+                <div class="weui-cell weui-cell_select weui-cell_select-after">
+                    <div class="weui-cell__hd">
+                        <label class="weui-label">城市:</label>
+                    </div>
+                    <div class="weui-cell__bd">
+                        <select class="weui-select city" name="city">
+                            <option value="Montreal" {{#ifeq order.address.city 'Montreal'}}selected{{/ifeq}}>Montreal</option>
+                            <option value="Longueuil" {{#ifeq order.address.city 'Longueuil'}}selected{{/ifeq}}>Longueuil</option>
+                            <option value="Brossard" {{#ifeq order.address.city 'Brossard'}}selected{{/ifeq}}>Brossard</option>
+                            <option value="Quebec" {{#ifeq order.address.city 'Quebec'}}selected{{/ifeq}}>Quebec</option>
+                        </select>
+                    </div>
+                </div>
+            
+                <div class="weui-cell"> 
+                    <div class="weui-cell__bd"><label class="weui-label">Qc, Canada</label></div>
+                    <div class="weui-cell__bd">
+                        <input class="weui-input postal" placeholder="Postal code (邮编)" {{#if order.address}}value="{{order.address.postal}}" disabled{{/if}} required>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="weui-form__opr-area">
+        <a class="weui-btn weui-btn_primary {{#if order.address}}weui-btn_default{{/if}}" href="javascript:" id="confirm">确定</a>
+    </div>
+</div>
+
+{{#section 'script'}}
+<script>
+    var $addressBox = $('.address-box');
+    var $form = $('.address-form');
+
+    $('.add-address').on('click', function(e) {
+        $form.toggleClass('display-none');
+        $addressBox.toggleClass('display-none');
+        $(this).toggleClass('plus');
+    });
+
+    $('input').on('keyup touchend', function(e) {
+        if($(this).val()) $(this).removeClass('error');
+    });
+
+    $('#confirm').click(function(e) {
+        if ($form.hasClass('display-none')) {
+            var id = $('input[name=radio1]:checked', $addressBox).data('id');
+            if (!id) return;
+            return $.ajax({
+                type: "POST",
+                dataType: 'json',
+                url: '/api/order/{{order._id}}/add_address',
+                data: {address: id},
+                success: function(res) {
+                    console.log(res);
+                    if (res && res._id) {
+                        
+                    } else {
+                        
+                    }
+                },
+                error: function(err) {
+                    console.log(err);
+                }
+            });
+        };
+        // create new address
+        var $street = $form.find('.street'),
+            $postal = $form.find('.postal');
+        if (!$street.val()) $street.addClass('error');
+        if (!$postal.val()) $postal.addClass('error');
+        if ($street.val() && $postal.val()) {
+            var data = {
+                street: $street.val(), 
+                postal: $postal.val(), 
+                city: $form.find('.city').val(), 
+                user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc'
+            };
+            if ($form.data('id')) data['_id'] = $form.data('id');
+            $.ajax({
+                type: "POST",
+                dataType: 'json',
+                url: '/api/order/{{order._id}}/address',
+                data: data,
+                success: function(res) {
+                    console.log(res);
+                    if (res && res._id) {
+                        
+                    } else {
+                        
+                    }
+                },
+                error: function(err) {
+                    console.log(err);
+                }
+            });
+        }
+    });
+</script>
+{{/section}}

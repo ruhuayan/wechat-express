@@ -1,12 +1,12 @@
 const PackageStatus = Object.freeze(
     {
-        Creating: 'Creating',
-        Confirmed: 'Confirmed',
-        InWarehouse1: 'InWarehouseCN',
-        InCustom: 'InCustom',
-        OutCustom: 'OutCustom',
-        Inwarehouse2: 'InwarehouseCA',
-        InDelivery: 'Delivering',
+        Confirm: 'Confirm',
+        InWarehouseCN: 'InWarehouseCN',
+        InCustomCN: 'InCustomCN',
+        Shipping: 'Shipping',
+        InCustomCA: 'InCustomCA',
+        InwarehouseCA: 'InwarehouseCA',
+        Delivering: 'Delivering',
         Delivered: 'Delivered'
     }
 );

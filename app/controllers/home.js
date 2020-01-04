@@ -86,7 +86,7 @@ const handleUserSync = (req, res, next) => {
     }
 
     const openid = req.query.openid;
-    User.findOne({ openid }).exec((err, user) => {
+    User.findOne({ _id: openid }).exec((err, user) => { 
         if (err) {
             return next(err);
         }
@@ -99,7 +99,7 @@ const handleUserSync = (req, res, next) => {
 
         console.log(`create new user: ${openid}`);
         const newUser = new User({
-            openid
+            _id: openid
         });
 
         newUser.save(function (e, u) {

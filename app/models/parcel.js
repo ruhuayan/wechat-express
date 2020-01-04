@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const ParcelSchema = new Schema({
-    user: { type: Schema.ObjectId, ref: 'User', required: '`user`是必填字段' },
-    series: { type: String, required: '`series`是必填参数' },
+    user: { type: String, ref: 'User', required: '`user`是必填字段' },
+    series: { type: String, required: '`series`是必填参数', unique: true },
     weight: { type: Number, min: 0, default: 0 },
     description: { type: String, maxlength: 30, trim: true },
     packed: { type: Boolean, default: false }

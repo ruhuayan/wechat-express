@@ -1,0 +1,274 @@
+{{#section 'style'}}
+<style>
+    .parcel-form {
+        width: 96%;
+        margin: auto;
+        padding-top: 24px;
+    }
+    .weui-form__text-area {
+        text-align: center;
+    }
+    .weui-form__control-area {
+        margin: 12px 0;
+    }
+    .weui-form__opr-btm {
+        position: fixed;
+        bottom: 4rem;
+        right: 1rem;
+    }
+    .weui-cells_form .weui-cell__ft {
+        text-align: center;
+        font-size: 20px;
+    }
+    
+    /*.weui-form__opr-area {
+        text-align: right;
+        padding-right: 15px;
+    } */
+
+    input.weui-input:not([disabled]) {
+        background: #eee;
+    }
+    .weui-icon-cancel, .weui-icon-success {
+        color: #00B7FF;
+        font-size: 20px;
+    }
+</style>
+{{/section}}
+<div class="weui-form parcel-form">
+    <div class="weui-form__text-area">
+        <h2 class="weui-form__title">{{title}}</h2>
+        <div class="weui-form__desc"></div>
+    </div>
+    <div class="weui-form__control-area">
+        <div class="weui-cells__group weui-cells__group_form">
+            <div class="weui-cells weui-cells_form parcel-list">
+                {{#each parcels}}
+                    <div class="weui-cell parcel-unit" data-id="{{_id}}">
+                        
+                        <div class="weui-cell__bd">
+                            <input class="weui-input parcel-series" placeholder="填写单号" value="{{series}}" disabled>
+                        </div>
+                        <div class="weui-cell__ft">
+                            <a class="edit-parcel">
+                                <i class="weui-icon-edit"></i>
+                            </a>
+                            <a class="delete-parcel">
+                                <i class="weui-icon-delete"></i>
+                            </a>
+                            <a class="save-edit display-none">
+                                <i class="weui-icon-success"></i>
+                            </a>
+                            <a class="cancel-edit display-none">
+                                <i class="weui-icon-cancel"></i>
+                            </a>
+                        </div>
+                    </div>
+                {{/each}}
+                <div class="weui-cell parcel-unit"> 
+                    <div class="weui-cell__bd">
+                        <input class="weui-input parcel-series" placeholder="填写单号">
+                        {{!-- <input class="weui-input parcel-desc" placeholder="简单描述"> --}}
+                    </div>
+                    <div class="weui-cell__ft">
+                        <a class="scan-parcel">
+                            <i class="weui-icon-scan"></i>
+                        </a>
+                        <a class="add-parcel disabled">
+                            <i class="weui-icon-add"></i>
+                        </a>
+                        <a class="edit-parcel display-none">
+                            <i class="weui-icon-edit"></i>
+                        </a>
+                        <a class="delete-parcel display-none">
+                            <i class="weui-icon-delete"></i>
+                        </a>
+                        <a class="save-edit display-none">
+                            <i class="weui-icon-success"></i>
+                        </a>
+                        <a class="cancel-edit display-none">
+                            <i class="weui-icon-cancel"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="weui-form__opr-btm">
+        <a class="next" href="javascript:">下一步 ></a>
+    </div>
+</div>
+<div class="js_dialog" id="androidDialog" style="opacity: 0; display: none;">
+    <div class="weui-mask"></div>
+    <div class="weui-dialog weui-skin_android">
+        <div class="weui-dialog__hd"><strong class="weui-dialog__title">删除包裹</strong></div>
+        <div class="weui-dialog__bd">
+            确定删除包裹 <span class="parcelId"></span>?
+        </div>
+        <div class="weui-dialog__ft">
+            <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_default">取消</a>
+            <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary confirm-delete">确定</a>
+        </div>
+    </div>
+</div>
+{{#section 'script'}}
+<script>
+    var parcel_unit_dom = $('.parcel-unit:not([data-id])').clone();
+
+    $('.parcel-series').on('keyup', function(e) {
+        var addBtn = $(this).closest('.parcel-unit').find('.add-parcel');
+        if ($(this).val()) addBtn.removeClass('disabled');
+        else addBtn.addClass('disabled'); 
+    });
+   
+    $('.add-parcel').on('click', function(e) {
+        
+        if ($(this).hasClass('disabled')) return;
+        var parcel_unit = $(this).closest('.parcel-unit');
+        var parcel_series = parcel_unit.find('.parcel-series');
+        var addBtn = $(this);
+        var data = {series: parcel_series.val(), user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc'};
+        parcel_series.attr('disabled', 'disabled');
+        addBtn.addClass('display-none');
+
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            url: '/api/parcel',
+            data: data,
+            success: function(res) {
+                
+                if (res && res._id) {
+                    parcel_unit.data('id', res._id);
+                    parcel_unit.find('.edit-parcel').removeClass('display-none');
+                    parcel_unit.find('.delete-parcel').removeClass('display-none');
+                    parcel_unit.find('.scan-parcel').addClass('display-none');
+                    parcel_unit.after(parcel_unit_dom.clone());
+                } else {
+                    parcel_unit.find('.edit-parcel').addClass('display-none');
+                    parcel_unit.find('.delete-parcel').addClass('display-none');
+                    addBtn.removeClass('display-none');
+                }
+            },
+            error: function(err) {
+                console.log(err);
+            }
+        });
+    });
+
+    $('.scan-parcel').on('click', function(e) {
+        var parcel_unit = $(this).closest('.parcel-unit');
+        var parcel_series = parcel_unit.find('.');
+        wx.scanQRCode({
+            needResult: 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
+            scanType: ["qrCode","barCode"], // 可以指定扫二维码还是一维码，默认二者都有
+            success: function (res) {
+                var result = res.resultStr; // 当needResult 为 1 时，扫码返回的结果
+                parcel_series.val(result);
+            }
+        });
+    });
+    
+    var $dialog = $('#androidDialog');
+    $('.delete-parcel').on('click', function(e) {
+        var parcel_unit = $(this).closest('.parcel-unit');
+        var id = parcel_unit.data('id');
+        if (!id) return;
+        
+        $dialog.fadeIn(200).find('.parcelId').text(parcel_unit.find('.parcel-series').val()); 
+        $dialog.on('click', '.weui-dialog__btn', function(){
+            $dialog.fadeOut(200);
+            $dialog.off('click', '.weui-dialog__btn', null);
+            if ($(this).hasClass('confirm-delete')) {
+                $.ajax({
+                    type: "DELETE",
+                    url: '/api/parcel/' + id,
+                    success: function(res) {
+                        
+                        if (res && res.success) {
+                            parcel_unit.remove();
+                        }
+                    },
+                    error: function(err) {
+                        console.log(err);
+                    }
+                });
+            }
+        });
+    });
+    
+    $('.edit-parcel').on('click', function(e) {
+        var parcel_unit = $(this).closest('.parcel-unit');
+        var parcel_series = parcel_unit.find('.parcel-series');
+        parcel_series.data('series', parcel_series.val()).removeAttr('disabled').focus();
+        $(this).addClass('display-none');
+        parcel_unit.find('.delete-parcel').addClass('display-none');
+        parcel_unit.find('.save-edit').removeClass('display-none');
+        parcel_unit.find('.cancel-edit').removeClass('display-none');
+    });
+
+    $('.cancel-edit').on('click', function(e) {
+        var parcel_unit = $(this).closest('.parcel-unit');
+        var parcel_series = parcel_unit.find('.parcel-series');
+        var series = parcel_series.data('series');
+        parcel_series.attr('disabled', 'disabled').val(series);
+        $(this).addClass('display-none');
+        parcel_unit.find('.delete-parcel').removeClass('display-none');
+        parcel_unit.find('.edit-parcel').removeClass('display-none');
+        parcel_unit.find('.save-edit').addClass('display-none');
+    });
+
+    $('.save-edit').on('click', function(e) {
+        var parcel_unit = $(this).closest('.parcel-unit');
+        var parcel_series = parcel_unit.find('.parcel-series');
+        var id = parcel_unit.data('id');
+        if (!id) return;
+        var data = {series: parcel_series.val(), user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc'};
+        parcel_series.attr('disabled', 'disabled');
+        var saveBtn = parcel_unit.find('.save-edit');
+        saveBtn.addClass('display-none');
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            url: '/api/parcel/' + id,
+            data: data,
+            success: function(res) {
+
+                if (res && res._id) {
+                    parcel_unit.find('.edit-parcel').removeClass('display-none');
+                    parcel_unit.find('.delete-parcel').removeClass('display-none');
+                    parcel_unit.find('.cancel-edit').addClass('display-none');
+                } 
+            },
+            error: function(err) {
+                console.log(err);
+            }
+        });
+    });
+    $('.next').click(function(e) {
+        var parcels = [];
+        $('.parcel-unit[data-id]').each(function(u) {
+            parcels.push($(this).data('id'));
+        });
+        if (!parcels.length) return;
+        var data = {parcels: parcels, user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc'};
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            url: '/api/order',
+            data: data,
+            success: function(res) {
+                console.log(res);
+                if (res && res._id) {
+                    
+                } else {
+                    
+                }
+            },
+            error: function(err) {
+                console.log(err);
+            }
+        });
+    });
+</script>
+{{/section}}

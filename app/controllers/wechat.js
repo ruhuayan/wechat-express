@@ -3,6 +3,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 // const request = require('request');
 const User = mongoose.model('User');
+const Parcel = mongoose.model('Parcel');
+const Order = mongoose.model('Order');
+const Address = mongoose.model('Address');
 const router = express.Router();
 const jssdk = require('../libs/jssdk');
 const baseUrl = 'https://34a631d7.ngrok.io';
@@ -29,11 +32,40 @@ router.get('/',  (req, res, next) => {
 });
 
 router.get('/register_parcel', (req, res, next) => {
-    
-    res.render('register_parcel', {
-        title: '包裹登记',
-        signPackage: JSON.stringify(req.signPackage),
-        // pretty: true,
+    Parcel.find({ packed: false, user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc'}).exec((err, parcels) => {
+        res.render('parcel', {
+            title: '包裹登记',
+            signPackage: JSON.stringify(req.signPackage),
+            parcels,
+        });
+    });
+});
+
+router.get('/order/:orderid/edit_parcel', (req, res, next) => {
+    if (!req.params.orderid) {
+        return res.send('非法请求，缺少userid参数');
+    }
+});
+
+router.get('/order/:orderid/edit_address', (req, res) => {
+    if (!req.params.orderid) {
+        return res.send('非法请求，缺少userid参数');
+    }
+    Order.findOne({_id: req.params.orderid}).populate('address')
+        // .populate({path: 'user', select:'addresses', populate: {path: 'addresses'}})
+        .exec(async(err, order) => {
+        if (err || !order) {
+            return res.send('没有找到订单');
+        }
+        
+        const addresses = order.address? null : await Address.find({user: order.user}).sort({createdAt: -1}).limit(2).exec();
+        
+        res.render('address', {
+            title: '填写地址',
+            signPackage: JSON.stringify(req.signPackage),
+            order,
+            addresses,
+        });
     });
 });
 

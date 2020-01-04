@@ -6,6 +6,7 @@
     <title>{{title}}-海运拼箱</title>
     <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.3/weui.min.css">
     <link rel="stylesheet" href="/css/style.css">
+    {{{_sections.style}}}
     {{#if ENV_DEVELOPMENT}}
         <script src="http://localhost:35729/livereload.js"></script>
     {{/if}}
@@ -33,7 +34,7 @@
         </p>
         <p class="weui-footer__text">Copyright © 2019-2020 richyan.com</p>
   </div>
-
+    <script src="/js/zepto.min.js"></script>
     {{#if signPackage}}
         <script src="/js/jweixin-1.4.0.js"></script>
         <script>
@@ -77,17 +78,8 @@
                     }
                 });
             });
-        
-            function scan () {
-                wx.scanQRCode({
-                    needResult: 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
-                    scanType: ["qrCode","barCode"], // 可以指定扫二维码还是一维码，默认二者都有
-                    success: function (res) {
-                        var result = res.resultStr; // 当needResult 为 1 时，扫码返回的结果
-                    }
-                });
-            }
         </script>
-    {{/if}}
+        {{{_sections.script}}}
+    {{/if}} 
   </body>
 </html>

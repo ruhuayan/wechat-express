@@ -21,7 +21,8 @@ header {
   font-size: 1rem; }
 
 .page__hd {
-  padding: 40px; }
+  padding: 40px;
+  text-align: center; }
 
 .page__content .weui-grid__label {
   color: #1aad19; }
@@ -33,32 +34,6 @@ a.menu__icon {
     width: 24px;
     height: 24px; }
 
-.register_parcel-form {
-  width: 90%;
-  margin: auto;
-  padding-top: 24px; }
-  .register_parcel-form .weui-form__text-area {
-    text-align: center; }
-  .register_parcel-form .weui-form__control-area {
-    margin: 24px 0; }
-  .register_parcel-form .weui-label {
-    width: 55px; }
-  .register_parcel-form .weui-form__opr-area .weui-btn {
-    margin: 1rem; }
-  .register_parcel-form .weui-cell__ft {
-    text-align: center; }
-    .register_parcel-form .weui-cell__ft .weui-label {
-      font-size: 17px;
-      font-weight: bold; }
-    .register_parcel-form .weui-cell__ft .weui-btn {
-      font-size: 16px;
-      padding: 0 12px;
-      margin-left: 0;
-      height: auto;
-      width: auto;
-      line-height: 2em;
-      background: transparent; }
-
 .parcel-search .weui-search-bar {
   background: #fff; }
   .parcel-search .weui-search-bar::before {
@@ -68,4 +43,21 @@ a.menu__icon {
   line-height: 1.42857143em; }
 
 .parcel-search .searchbar-result {
+  display: none; }
+
+.weui-icon-edit::before {
+  content: url(/img/edit.svg); }
+
+.weui-icon-add::before {
+  content: url(/img/add.svg); }
+
+.weui-icon-scan::before {
+  content: url(/img/scan.svg);
+  width: 20px; }
+
+a.disabled {
+  cursor: not-allowed;
+  opacity: 0.2; }
+
+.display-none {
   display: none; }

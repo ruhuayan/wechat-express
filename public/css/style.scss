@@ -29,6 +29,7 @@ header {
 }
 .page__hd {
     padding: 40px;
+    text-align: center;
 }
 .page__content .weui-grid__label {
     color: $themeColor;
@@ -40,40 +41,6 @@ a.menu__icon {
     img {
         width: 24px;
         height: 24px;
-    }
-}
-
-.register_parcel-form {
-    width: 90%;
-    margin: auto;
-    padding-top: 24px;
-    .weui-form__text-area {
-        text-align: center;
-    }
-    .weui-form__control-area {
-        margin: 24px 0;
-    }
-    .weui-label {
-        width: 55px;
-    }
-    .weui-form__opr-area .weui-btn {
-        margin: 1rem;
-    }
-    .weui-cell__ft {
-        text-align: center;
-        .weui-label {
-            font-size: 17px;
-            font-weight: bold;
-        }
-        .weui-btn {
-            font-size: 16px;
-            padding: 0 12px;
-            margin-left: 0;
-            height: auto;
-            width: auto;
-            line-height: 2em;
-            background: transparent;
-        }
     }
 }
 
@@ -90,4 +57,23 @@ a.menu__icon {
     .searchbar-result {
         display: none;
     }
+}
+
+.weui-icon-edit::before {
+    content: url(/img/edit.svg);
+}
+.weui-icon-add::before {
+    content: url(/img/add.svg);
+}
+.weui-icon-scan::before {
+    content: url(/img/scan.svg);
+    width: 20px;
+}
+
+a.disabled {
+    cursor: not-allowed;
+    opacity: 0.2;
+}
+.display-none {
+    display: none;
 }
