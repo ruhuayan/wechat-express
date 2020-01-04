@@ -20,7 +20,7 @@
     "glob": "^6.0.4",
     "messaging-api-wechat": "^0.8.4",
     "method-override": "^2.3.0",
-    "mongoose": "^4.10.8",
+    "mongoose": "^5.7.5",
     "morgan": "^1.6.1",
     "serve-favicon": "^2.3.0",
     "wechat": "^2.1.0",
