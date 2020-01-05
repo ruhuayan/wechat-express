@@ -1,21 +1,26 @@
 // @import '/node_modules/weui/dist/style/weui.min.css';
-$themeColor: #1aad19;
+:root {
+    --theme-color: #1aad19;
+    --link-color: #00B7FF;
+}
 body {
     padding: 50px 0px;
     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
 a {
-    color: #00B7FF;
+    color: var(--link-color);
 }
-
+// header
 header {
     position: fixed;
     top: 0;
     left: 0;
     display: flex;
     align-items: center;
-    background-color: $themeColor;
+    background-color: var(--theme-color);
     color: #fff;
     box-shadow: 0 2px 5px 1px rgba(0,0,0,.14), 0 3px 14px 2px rgba(0,0,0,.12), 0 5px 5px -3px rgba(0,0,0,.12);
     justify-content: space-between;
@@ -27,21 +32,87 @@ header {
     //   width: 33%;
     // }
 }
-.page__hd {
-    padding: 40px;
-    text-align: center;
-}
-.page__content .weui-grid__label {
-    color: $themeColor;
-}
-
-a.menu__icon {
+.menu__icon {
     margin-left: 10px;
     margin-right: 10px;
     img {
         width: 24px;
         height: 24px;
     }
+}
+.user-logo {
+    display:inline-block;
+    position:relative;
+}
+#menu-check {
+    position: absolute;
+    width: 0;
+    height: 0;
+    &:checked {
+        opacity: 0;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100vh;
+    }
+}
+#menu-check:checked ~ .mobile-nav {
+    height: auto;
+}
+.mobile-nav {
+    position: absolute;
+    right: 5px;
+    height: 0px;
+    margin-top: 10px;
+    overflow: hidden;
+    z-index:99999999;
+    box-shadow:0 1px 8px rgba(0,0,0,0.5);
+    border-radius: 3px;
+    
+    .navbar-item {
+        position: relative;
+        background:#333;
+        a {
+            display: block;
+            padding: 10px 20px;
+            color: #fff;
+            text-align: center;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 300;
+        }
+    }
+    /*i {
+        position:absolute;
+        bottom:100%;
+        left:50%;
+        margin-left:-12px;
+        width:24px;
+        height:12px;
+        overflow:hidden;
+        &::before {
+            content:'';
+            position:absolute;
+            width:12px;
+            height:12px;
+            left:50%;
+            transform:translate(-50%,50%) rotate(45deg);
+            background-color:#EEEEEE;
+            box-shadow:0 1px 8px rgba(0,0,0,0.5);
+        }
+    }*/
+}
+// weui-form
+.weui-form {
+    width: 96%;
+    margin: auto;
+    padding-top: 24px;
+}
+.weui-form__text-area {
+    text-align: center;
+}
+.weui-form__control-area {
+    margin: 12px 0;
 }
 
 .parcel-search {

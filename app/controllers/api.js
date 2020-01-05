@@ -114,7 +114,7 @@ router.post('/order/:id/address', (req, res) => {
     if (!req.params.id) {
         return res.json({success: 0, msg: '缺少id参数'})
     }
-    console.log( req.get('host'));
+    
     if (req.body._id && req.body._id !== '') {
         Address.findByIdAndUpdate(req.body._id, req.body, (err, address) => {
             if (err) return res.status(500).send(err);

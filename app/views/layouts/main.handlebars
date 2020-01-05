@@ -14,15 +14,21 @@
 <body>
   <header>
     <div class="mainMenuBtn">
-        <a href="/wechat/" class="menu__icon">
+        <a href="/" class="menu__icon">
             <img src="/img/mainMenu.svg" alt="包裹登记" >
         </a>
     </div>
     <div class="logo">{{title}} - 海运拼箱</div>
     <div class="userLogo">
-        <a href="javascript:;" class="menu__icon">
+        <input type="checkbox" id="menu-check" class="mobile-check" />
+        <label href="javascript:;" class="menu__icon" for="menu-check">
             <img src="/img/account.svg" alt="会员中心" >
-        </a>
+        </label>
+        <nav class="mobile-nav">
+            <div class="navbar-item"><a href="/profile">账号管理</a></div>
+            <div class="navbar-item"><a href="/orders">订单历史</a></div> 
+            <i></i>
+        </nav>
     </div>
   </header>
 
