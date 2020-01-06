@@ -1,0 +1,100 @@
+{{#section 'style'}}
+<style>
+    ul.status {
+        display: inline-flex;
+        flex-flow: row wrap;
+        margin-top: 1em;
+    }
+    ul.status li {
+        display: inline;
+        border-top: 1px solid var(--theme-color);
+        margin-top: .5em;
+        width: 33%;
+    }
+    ul.status li:nth-child(3n) {
+        text-align: right;
+    }
+    ul.status li:last-child {
+        border-top: none;
+    }
+    ul.status li span {
+        display: inline-block;
+        vertical-align: middle;
+        position: relative;
+        top: -0.9em;
+        padding: 0 .55em;
+        background-color: #FFFFFF;
+        color: var(--theme-color);
+    }
+    ul.status li.active,
+    ul.status li.active ~ li{
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    ul.status li.active ~ li span {
+        color: rgba(0, 0, 0, 0.5);
+    }
+</style>
+{{/section}}
+<div class="weui-form parcel-form">
+    <div class="weui-form__text-area">
+        <h2 class="weui-form__title">{{title}}</h2>
+        <div class="weui-form__desc"></div>
+    </div>
+    <div class="weui-form__control-area">
+        <div class="weui-panel_access">
+            {{#if order}}
+            <div class="weui-panel__hd">单号：{{order._id}}</div>
+            <div class="weui-panel__bd">
+                <div class="weui-media-box weui-media-box_appmsg">
+                    <div class="weui-media-box__bd">
+                        <h4 class="weui-media-box__title">包裹号</h4>
+                        {{#each order.parcels}}
+                        <p class="weui-media-box__desc">{{.}}</p>
+                        {{/each}}
+                    </div>
+                    {{#ifeq order.status 'Confirm'}}
+                    <div class="weui-media-box__ft">
+                        <a href="/order/{{order._id}}/parcel">
+                            <i class="weui-icon-edit"></i>
+                        </a>
+                    </div>
+                    {{/ifeq}}
+                </div>
+                <div class="weui-media-box weui-media-box_appmsg">
+                    <div class="weui-media-box__bd">
+                        <h4 class="weui-media-box__title">地址</h4>
+                        <p class="weui-media-box__desc">{{order.address.street}}</p>
+                        <p class="weui-media-box__desc">{{order.address.city}}, QC, Canada</p>
+                        <p class="weui-media-box__desc">{{order.address.postal}}</p>
+                    </div>
+                    <a href="/order/{{order._id}}/address">
+                        <i class="weui-icon-edit"></i>
+                    </a>
+                </div>
+                <a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg">
+                    <div class="weui-media-box__bd">
+                        <h4 class="weui-media-box__title">状态:</h4>
+                        <ul class="status">
+                        {{#each status}}
+                            <li class="status-line {{#ifeq @key 'Confirm'}}active{{/ifeq}}">
+                                <span class="status-tips">{{.}}</span>
+                            </li>
+                        {{/each}}
+                        </ul>
+                        
+                    </div>
+                </a>
+            </div>
+            <div class="weui-panel__ft">
+                <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link">
+                    <div class="weui-cell__bd">查看更多</div>
+                    <span class="weui-cell__ft"></span>
+                </a>    
+            </div>
+            {{/if}}
+            {{#unless order}}
+            <h4>没有找到订单</h4>
+            {{/unless}}
+        </div>
+    </div>
+</div>

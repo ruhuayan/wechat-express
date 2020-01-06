@@ -9,7 +9,7 @@ const Address = mongoose.model('Address');
 const router = express.Router();
 const jssdk = require('../libs/jssdk');
 const baseUrl = 'https://34a631d7.ngrok.io';
-const PackageStatus = require('../libs/status');
+const {PackageStatus, StatusMessage} = require('../libs/status');
 
 module.exports = (app) => {
     app.use('/', router);
@@ -45,23 +45,43 @@ router.get('/register_parcel', (req, res, next) => {
     });
 });
 
-router.get('/order/:orderid/edit_parcel', (req, res, next) => {
+function checkOrderId(req, res, next) {
     if (!req.params.orderid) {
-        return res.send('非法请求，缺少userid参数');
-    }
+        const matches = req.url.match(/(parcel)|(address)/g);
+        const viewUrl = matches.length? matches[0] : 'order';
+        return res.render(viewUrl, {
+            title: '缺少userid参数',
+            signPackage: JSON.stringify(req.signPackage),
+        });
+    } else next();
+}
+
+function orderNotFound(req, res) {
+    return res.render('order', {
+        title: '订单',
+        signPackage: JSON.stringify(req.signPackage),
+    });
+}
+router.get('/order/:orderid/parcel', checkOrderId, (req, res, next) => {
+
+    Order.findOne({_id: req.params.orderid}).exec(async(err, order) => {
+        if (err || !order) {
+            return orderNotFound(req, res);
+        };
+        res.render('parcel', {
+            title: '填写地址',
+            signPackage: JSON.stringify(req.signPackage),
+            parcels: order.parcels,
+        });
+    });
 });
 
-router.get('/order/:orderid/edit_address', (req, res) => {
-    if (!req.params.orderid) {
-        return res.send('非法请求，缺少userid参数');
-    }
-    Order.findOne({_id: req.params.orderid}).populate('address')
-        // .populate({path: 'user', select:'addresses', populate: {path: 'addresses'}})
-        .exec(async(err, order) => {
+router.get('/order/:orderid/address', checkOrderId, (req, res) => {
+    
+    Order.findOne({_id: req.params.orderid}).populate('address').exec(async(err, order) => {
         if (err || !order) {
-            return res.send('没有找到订单');
+            return orderNotFound(req, res);
         }
-        
         const addresses = order.address? null : await Address.find({user: order.user}).sort({createdAt: -1}).limit(2).exec();
         
         res.render('address', {
@@ -73,21 +93,18 @@ router.get('/order/:orderid/edit_address', (req, res) => {
     });
 });
 
-router.get('/order/:orderid', (req, res) => {
-    if (!req.params.orderid) {
-        return res.send('非法请求，缺少userid参数');
-    }
+router.get('/order/:orderid', checkOrderId, (req, res) => {
+
     Order.findOne({_id: req.params.orderid})
         .populate('address')
         .populate({path: 'pacels', select:'series'})
         .exec((err, order) => {
-        if (err || !order) {
-            return res.send('没有找到订单');
-        }
+
         res.render('order', {
             title: '订单',
             signPackage: JSON.stringify(req.signPackage),
             order,
+            status: StatusMessage
         });
     });
 });
@@ -115,17 +132,24 @@ router.get('/faq', (req, res, next) => {
     res.send('faq page');
 });
 
-router.get('/history/:userid', (req, res, next) => {
-    if (!req.params.userid) {
-        return res.send('非法请求，缺少userid参数');
-    }
+router.get('/orders', (req, res, next) => {
 
-    User.findOne({ _id: req.params.userid }).exec(function (err, user) {
+    User.findOne({ _id: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc' }).exec(function (err, user) {
         if (err || !user) {
             return res.send('没有找到用户')
         }
 
-        console.log(`find user: ${user}`);
+        res.json(user);
     });
 
+});
+
+router.get('/profile', (req, res) => {
+    User.findOne({ _id: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc' }).exec(function (err, user) {
+        if (err || !user) {
+            return res.send('没有找到用户')
+        }
+
+        res.json(user);
+    });
 });

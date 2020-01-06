@@ -1,8 +1,25 @@
-<div class="page parcel-search js_show">
-    <div class="page__hd">
-        <h1 class="page__title">{{title}}</h1>
+{{#section 'style'}}
+<style>
+    .weui-search-bar {
+        background: #fff;
+    }
+    .weui-search-bar::before {
+        border: none;
+    }
+    .weui-search-bar__label {
+        line-height: 1.42857143em;
+    }
+    .weui-cells {
+        margin-top: 0;
+    }
+</style>
+{{/section}}
+<div class="weui-form parcel-form">
+    <div class="weui-form__text-area">
+        <h2 class="weui-form__title">{{title}}</h2>
+        <div class="weui-form__desc"></div>
     </div>
-    <div class="page__bd">
+    <div class="weui-form__control-area">
         <!--<a href="javascript:;" class="weui-btn weui-btn_primary">点击展现searchBar</a>-->
         <div class="weui-search-bar" id="searchBar">
             <form class="weui-search-bar__form">
@@ -19,30 +36,10 @@
             <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
         </div>
         <div class="weui-cells searchbar-result" id="searchResult">
-            <div class="weui-cell weui-cell_access">
-                <div class="weui-cell__bd weui-cell_primary">
-                    <p>实时搜索文本</p>
-                </div>
-            </div>
-            <div class="weui-cell weui-cell_access">
-                <div class="weui-cell__bd weui-cell_primary">
-                    <p>实时搜索文本</p>
-                </div>
-            </div>
-            <div class="weui-cell weui-cell_access">
-                <div class="weui-cell__bd weui-cell_primary">
-                    <p>实时搜索文本</p>
-                </div>
-            </div>
-            <div class="weui-cell weui-cell_access">
-                <div class="weui-cell__bd weui-cell_primary">
-                    <p>实时搜索文本</p>
-                </div>
-            </div>
         </div>
     </div>
 </div>
-
+{{#section 'script'}}
 <script type="text/javascript" class="searchbar js_show">
     $(function(){
         var $searchBar = $('#searchBar'),
@@ -53,7 +50,7 @@
             $searchCancel = $('#searchCancel');
 
         function hideSearchResult(){
-            $searchResult.hide();
+            $searchResult.empty();
             $searchInput.val('');
         }
         function cancelSearch(){
@@ -71,13 +68,26 @@
                 if(!this.value.length) cancelSearch();
             })
             .on('input', function(){
+                $searchResult.empty();
                 if(this.value.length) {
-                    $searchResult.show();
-                } else {
-                    $searchResult.hide();
+
+                    var orderId = this.value;
+                    $.ajax({
+                        type: "GET",
+                        dataType: 'json',
+                        url: '/api/order/' + orderId,
+                        success: function(res) { console.log(res)
+                            if (res && res.length) {
+                                res.forEach(function(order) {
+                                    var orderDiv = $('<a class="weui-cell" href="/order/' + order._id +'">' + order._id + '</a>');
+                                    $searchResult.append(orderDiv);
+                                });
+                            }
+                        },
+                    });
                 }
-            })
-        ;
+            });
+
         $searchClear.on('click', function(){
             hideSearchResult();
             $searchInput.focus();
@@ -88,3 +98,4 @@
         });
     });
 </script>
+{{/section}}

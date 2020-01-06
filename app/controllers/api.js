@@ -79,6 +79,18 @@ router.post('/order', (req, res, next) => {
     });
 });
 
+// search order
+router.get('/order/:id', (req, res, next) => {
+    if (!req.params.id) {
+        return res.json({success: 0, msg: '缺少id参数'})
+    }
+new RegExp(req.params.id)
+    Order.find({"$where": `/^${req.params.id}/.test(this._id.str)`}).select('_id').exec((err, order) => {
+        if (err) return res.status(500).send(err);
+        return res.status(200).send(order);
+    });
+});
+
 // edit order
 router.post('/order/:id', (req, res, next) => {
     if (!req.params.id) {

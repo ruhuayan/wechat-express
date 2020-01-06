@@ -115,21 +115,6 @@ header {
     margin: 12px 0;
 }
 
-.parcel-search {
-    .weui-search-bar {
-        &::before {
-            border: none;
-        }
-        background: #fff;
-    }
-    .weui-search-bar__label {
-        line-height: 1.42857143em;
-    }
-    .searchbar-result {
-        display: none;
-    }
-}
-
 .weui-icon-edit::before {
     content: url(/img/edit.svg);
 }

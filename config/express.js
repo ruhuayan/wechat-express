@@ -18,19 +18,7 @@ module.exports = (app, config) => {
         layoutsDir: config.root + '/app/views/layouts/',
         defaultLayout: 'main',
         partialsDir: [config.root + '/app/views/partials/'],
-        helpers: {
-            section: function(name, options){ 
-                if(!this._sections) this._sections = {};
-                this._sections[name] = options.fn(this); 
-                return null;
-            },
-            ifeq: function(a, b, options){
-                if (a === b) {
-                    return options.fn(this);
-                    }
-                return options.inverse(this);
-            },
-        }    
+        helpers: require('./helpers')
     }));
     app.set('views', config.root + '/app/views');
     app.set('view engine', 'handlebars');
