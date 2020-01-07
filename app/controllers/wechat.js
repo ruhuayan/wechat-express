@@ -92,12 +92,10 @@ const handleUserSync = (req, res, next) => {
         }
 
         if (user) {
-            console.log(`use existing user: ${openid}`);
             req.user = user;
             return next();
         }
 
-        console.log(`create new user: ${openid}`);
         const newUser = new User({
             _id: openid
         });

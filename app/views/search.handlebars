@@ -76,7 +76,7 @@
                         type: "GET",
                         dataType: 'json',
                         url: '/api/order/' + orderId,
-                        success: function(res) { console.log(res)
+                        success: function(res) {
                             if (res && res.length) {
                                 res.forEach(function(order) {
                                     var orderDiv = $('<a class="weui-cell" href="/order/' + order._id +'">' + order._id + '</a>');

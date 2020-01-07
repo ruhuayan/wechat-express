@@ -10,7 +10,7 @@ function JSSDK(appId, appSecret) {
 }
 
 JSSDK.prototype = {
-    getSignPackage: function (url, done) {
+    getSignPackage: function (url, done) { console.log('sign', url)
         const instance = this;
 
         this.getJsApiTicket(function (err, jsApiTicket) {
@@ -21,7 +21,7 @@ JSSDK.prototype = {
             const nonceStr = instance.createNonceStr();
             const timestamp = Math.round(Date.now() / 1000);
 
-            // 生成签名
+            // 生成签名 
             const rawString = `jsapi_ticket=${jsApiTicket}&noncestr=${nonceStr}&timestamp=${timestamp}&url=${url}`;
             const hash = crypto.createHash('sha1');
             const signature = hash.update(rawString).digest('hex');
@@ -145,4 +145,4 @@ JSSDK.prototype = {
     },
 };
 
-module.exports = new JSSDK(process.env.APPID, process.env.APPSECRET);
+module.exports = new JSSDK('wx5757f4f7f07c5eec', '506c9f35e9706254bb3e638c0c3160dc');
