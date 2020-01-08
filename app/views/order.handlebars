@@ -49,12 +49,12 @@
                     <div class="weui-media-box__bd">
                         <h4 class="weui-media-box__title">包裹号</h4>
                         {{#each order.parcels}}
-                        <p class="weui-media-box__desc">{{.}}</p>
+                        <p class="weui-media-box__desc">{{series}}</p>
                         {{/each}}
                     </div>
                     {{#ifeq order.status 'Confirm'}}
                     <div class="weui-media-box__ft">
-                        <a href="/order/{{order._id}}/parcel">
+                        <a href="/order/{{order._id}}/parcels">
                             <i class="weui-icon-edit"></i>
                         </a>
                     </div>

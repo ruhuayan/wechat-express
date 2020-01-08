@@ -25,8 +25,9 @@
     </div>
     <div class="weui-form__control-area">
         <div class="weui-cells__group weui-cells__group_form">
-            <div class="weui-cells weui-cells_form parcel-list">
-                {{#each parcels}}
+            <div class="weui-cells weui-cells_form parcel-list" {{#if order}}data-id="{{order._id}}"{{/if}}>
+                {{#if order}}
+                {{#each order.parcels}}
                     <div class="weui-cell parcel-unit" data-id="{{_id}}">
                         
                         <div class="weui-cell__bd">
@@ -48,6 +49,7 @@
                         </div>
                     </div>
                 {{/each}}
+                {{/if}}
                 <div class="weui-cell parcel-unit"> 
                     <div class="weui-cell__bd">
                         <input class="weui-input parcel-series" placeholder="填写单号">
@@ -97,6 +99,7 @@
 {{#section 'script'}}
 <script>
     var $parcel_unit_dom = $('.parcel-unit:not([data-id])').clone();
+    var $parcel_list = $('.parcel-list');
 
     $('.parcel-series').on('keyup', function(e) {
         var $addBtn = $(this).closest('.parcel-unit').find('.add-parcel');
@@ -237,6 +240,9 @@
         });
         if (!parcels.length) return;
         var data = {parcels: parcels, user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc'};
+        var $this = $(this);
+        var orderId = $parcel_list.data('id');
+        if (orderId) data['_id'] = orderId;
         $.ajax({
             type: "POST",
             dataType: 'json',
@@ -247,10 +253,11 @@
                 if (res && res._id) {
                     document.location.href = '/order/' + res._id + '/address';
                 } else {
-                    $(this).hide();
+                    $this.hide();
                 }
             },
             error: function(err) {
+                $this.hide();
                 console.log(err);
             }
         });

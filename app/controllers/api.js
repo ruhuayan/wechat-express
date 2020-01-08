@@ -72,11 +72,19 @@ router.post('/order', (req, res, next) => {
     if (!req.body.user) {
         return res.json({success: 0, msg: '缺少user参数'});
     }
-    const newOrder = new Order(req.body);
-    newOrder.save(function (e, order) {
-        if (e) return res.status(500).send(e)
-        return res.status(200).send(order);
-    });
+
+    if (req.body.orderId) {
+        Order.findByIdAndUpdate(req.body.orderId, req.body, (err, order) => {
+            if (err || !order) return res.status(500).send(err);
+            return res.status(200).send(order);
+        });
+    } else {
+        const newOrder = new Order(req.body);
+        newOrder.save(function (e, order) {
+            if (e) return res.status(500).send(e)
+            return res.status(200).send(order);
+        });
+    }
 });
 
 // search order

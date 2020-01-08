@@ -3,7 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 // const request = require('request');
 const User = mongoose.model('User');
-const Parcel = mongoose.model('Parcel');
+// const Parcel = mongoose.model('Parcel');
 const Order = mongoose.model('Order');
 const Address = mongoose.model('Address');
 const router = express.Router();
@@ -36,12 +36,9 @@ router.get('/',  (req, res) => {
 });
 
 router.get('/register_parcel', (req, res, next) => {
-    Parcel.find({ packed: false, user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc'}).exec((err, parcels) => {
-        res.render('parcel', {
-            title: '包裹登记',
-            signPackage: JSON.stringify(req.signPackage),
-            parcels,
-        });
+    res.render('parcel', {
+        title: '包裹登记',
+        signPackage: JSON.stringify(req.signPackage),
     });
 });
 
@@ -62,16 +59,16 @@ function orderNotFound(req, res) {
         signPackage: JSON.stringify(req.signPackage),
     });
 }
-router.get('/order/:orderid/parcel', checkOrderId, (req, res, next) => {
+router.get('/order/:orderid/parcels', checkOrderId, (req, res, next) => {
 
-    Order.findOne({_id: req.params.orderid}).exec(async(err, order) => {
+    Order.findOne({_id: req.params.orderid}).select('_id parcels').populate({ path: 'parcels', select: 'series' }).exec(async(err, order) => {
         if (err || !order) {
             return orderNotFound(req, res);
         };
         res.render('parcel', {
             title: '填写地址',
             signPackage: JSON.stringify(req.signPackage),
-            parcels: order.parcels,
+            order,
         });
     });
 });
@@ -97,7 +94,7 @@ router.get('/order/:orderid', checkOrderId, (req, res) => {
 
     Order.findOne({_id: req.params.orderid})
         .populate('address')
-        .populate({path: 'pacels', select:'series'})
+        .populate({path: 'parcels', select:'series'})
         .exec((err, order) => {
 
         res.render('order', {
