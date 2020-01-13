@@ -1,0 +1,50 @@
+<div class="weui-form parcel-form">
+    <div class="weui-form__text-area">
+        <h2 class="weui-form__title">{{title}}</h2>
+        <div class="weui-form__desc"></div>
+    </div>
+    <div class="weui-form__control-area">
+        <div class="weui-panel_access">
+            {{#if user}}
+            <div class="weui-panel__hd">ID：{{user._id}}</div>
+            <div class="weui-panel__bd">
+                <div class="weui-media-box weui-media-box_appmsg">
+                    <div class="weui-media-box__bd">
+                        <h4 class="weui-media-box__title">个人信息</h4>
+                        
+                        <p class="weui-media-box__desc">无信息</p>
+                        
+                    </div>
+                </div>
+                <div class="weui-media-box weui-media-box_appmsg">
+                        
+                    {{#each addresses}}
+                    <div class="weui-media-box__bd">
+                        <h4 class="weui-media-box__title">地址 {{@index}}</h4>
+                        <p class="weui-media-box__desc">{{street}}</p>
+                        <p class="weui-media-box__desc">{{city}}, QC, Canada</p>
+                        <p class="weui-media-box__desc">{{postal}}</p>
+                    </div>
+                    {{/each}}
+                    {{#unless addresses}}
+                    <p class="weui-media-box__desc">没有提供地址</p>
+                    {{/unless}}
+
+                    <a href="javascript:void(0);">
+                        <i class="weui-icon-edit"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="weui-panel__ft">
+                <a href="/user/orders" class="weui-cell weui-cell_access weui-cell_link">
+                    <div class="weui-cell__bd">查看更多</div>
+                    <span class="weui-cell__ft"></span>
+                </a>    
+            </div>
+            {{/if}}
+            {{#unless user}}
+            <h4>没有找到用户</h4>
+            {{/unless}}
+        </div>
+    </div>
+</div>

@@ -132,25 +132,3 @@ router.get('/del-address', (req, res, next) => {
 router.get('/faq', (req, res, next) => {
     res.send('faq page');
 });
-
-router.get('/orders', (req, res, next) => {
-
-    User.findOne({ _id: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc' }).exec(function (err, user) {
-        if (err || !user) {
-            return res.send('没有找到用户')
-        }
-
-        res.json(user);
-    });
-
-});
-
-router.get('/profile', (req, res) => {
-    User.findOne({ _id: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc' }).exec(function (err, user) {
-        if (err || !user) {
-            return res.send('没有找到用户')
-        }
-
-        res.json(user);
-    });
-});
