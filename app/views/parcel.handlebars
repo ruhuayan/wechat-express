@@ -3,18 +3,28 @@
     .weui-form__opr-btm {
         position: fixed;
         bottom: 4rem;
-        right: 1rem;
+        width: 96%;
+        display: flex;
+        justify-content: space-between;
     }
     .weui-cells_form .weui-cell__ft {
         text-align: center;
         font-size: 20px;
     }
-    input.weui-input:not([disabled]) {
-        background: #eee;
-    }
     .weui-icon-cancel, .weui-icon-success {
         color: var(--link-color);
         font-size: 20px;
+    }
+    .weui-toast1 {
+        width: 90%;
+        position: fixed;
+        z-index: 5000;
+        min-height: 4em;
+        left: 5%;
+        background: #eee;
+        text-align: center;
+        border-radius: 5px;
+        color: var(--warn-color);
     }
 </style>
 {{/section}}
@@ -25,53 +35,51 @@
     </div>
     <div class="weui-form__control-area">
         <div class="weui-cells__group weui-cells__group_form">
-            <div class="weui-cells weui-cells_form parcel-list" {{#if order}}data-id="{{order._id}}"{{/if}}>
-                {{#if order}}
-                {{#each order.parcels}}
+            <div class="weui-cells weui-cells_form parcel-list" {{#if orderId}}data-id="{{orderId}}"{{/if}}>
+                {{#each parcels}}
                     <div class="weui-cell parcel-unit" data-id="{{_id}}">
                         
                         <div class="weui-cell__bd">
-                            <input class="weui-input parcel-series" placeholder="填写单号" value="{{series}}" disabled>
+                            <input class="weui-input parcel-series" placeholder="填写单号" value="{{series}}" onkeyup="keyupFunc(this)" disabled>
                         </div>
                         <div class="weui-cell__ft">
-                            <a class="edit-parcel">
+                            <a class="edit-parcel" onclick="editFunc(this)">
                                 <i class="weui-icon-edit"></i>
                             </a>
-                            <a class="delete-parcel">
+                            <a class="delete-parcel" onclick="deleteFunc(this)">
                                 <i class="weui-icon-delete"></i>
                             </a>
-                            <a class="save-edit display-none">
+                            <a class="save-edit display-none" onclick="saveFunc(this)">
                                 <i class="weui-icon-success"></i>
                             </a>
-                            <a class="cancel-edit display-none">
+                            <a class="cancel-edit display-none" onclick="cancelFunc(this)">
                                 <i class="weui-icon-cancel"></i>
                             </a>
                         </div>
                     </div>
                 {{/each}}
-                {{/if}}
                 <div class="weui-cell parcel-unit"> 
                     <div class="weui-cell__bd">
-                        <input class="weui-input parcel-series" placeholder="填写单号">
+                        <input class="weui-input parcel-series" placeholder="填写单号" onkeyup="keyupFunc(this)" >
                         {{!-- <input class="weui-input parcel-desc" placeholder="简单描述"> --}}
                     </div>
                     <div class="weui-cell__ft">
-                        <a class="scan-parcel">
+                        <a class="scan-parcel" onclick="scanFunc(this)">
                             <i class="weui-icon-scan"></i>
                         </a>
-                        <a class="add-parcel disabled">
+                        <a class="add-parcel disabled" onclick="addFunc(this)">
                             <i class="weui-icon-add"></i>
                         </a>
-                        <a class="edit-parcel display-none">
+                        <a class="edit-parcel display-none" onclick="editFunc(this)">
                             <i class="weui-icon-edit"></i>
                         </a>
-                        <a class="delete-parcel display-none">
+                        <a class="delete-parcel display-none" onclick="deleteFunc(this)">
                             <i class="weui-icon-delete"></i>
                         </a>
-                        <a class="save-edit display-none">
+                        <a class="save-edit display-none" onclick="saveFunc(this)">
                             <i class="weui-icon-success"></i>
                         </a>
-                        <a class="cancel-edit display-none">
+                        <a class="cancel-edit display-none" onclick="cancelFunc(this)">
                             <i class="weui-icon-cancel"></i>
                         </a>
                     </div>
@@ -80,6 +88,7 @@
         </div>
     </div>
     <div class="weui-form__opr-btm">
+        <a class="prev" href="javascript:">< 返回</a>
         <a class="next" href="javascript:">下一步 ></a>
     </div>
 </div>
@@ -96,23 +105,30 @@
         </div>
     </div>
 </div>
+<div id="toast" style="opacity: 0; display: none;">
+    <div class="weui-mask_transparent"></div>
+    <div class="weui-toast1">
+        <i class="weui-icon-warn"></i>
+        <p class="weui-toast__content"></p>
+    </div>
+</div>
 {{#section 'script'}}
 <script>
     var $parcel_unit_dom = $('.parcel-unit:not([data-id])').clone();
     var $parcel_list = $('.parcel-list');
 
-    $('.parcel-series').on('keyup', function(e) {
-        var $addBtn = $(this).closest('.parcel-unit').find('.add-parcel');
-        if ($(this).val()) $addBtn.removeClass('disabled');
+    function keyupFunc(el) {
+        var $addBtn = $(el).closest('.parcel-unit').find('.add-parcel');
+        if ($(el).val()) $addBtn.removeClass('disabled');
         else $addBtn.addClass('disabled'); 
-    });
-   
-    $('.add-parcel').on('click', function(e) {
+    }
+    
+    function addFunc(el) {
         
-        if ($(this).hasClass('disabled')) return;
-        var $parcel_unit = $(this).closest('.parcel-unit');
+        if ($(el).hasClass('disabled')) return;
+        var $parcel_unit = $(el).closest('.parcel-unit');
         var $parcel_series = $parcel_unit.find('.parcel-series');
-        var $addBtn = $(this);
+        var $addBtn = $(el);
         var data = {series: $parcel_series.val(), user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc'};
         $parcel_series.attr('disabled', 'disabled');
         $addBtn.addClass('display-none');
@@ -129,21 +145,40 @@
                     $parcel_unit.find('.edit-parcel').removeClass('display-none');
                     $parcel_unit.find('.delete-parcel').removeClass('display-none');
                     $parcel_unit.find('.scan-parcel').addClass('display-none');
-                    $parcel_unit.after($parcel_unit_dom.clone());
+                    var $newUnit = $parcel_unit_dom.clone();
+                    $parcel_unit.after($newUnit); console.log($newUnit)
+                    $newUnit.find('.parcel-series').focus()
                 } else {
+                    $parcel_series.removeAttr('disabled');
                     $parcel_unit.find('.edit-parcel').addClass('display-none');
                     $parcel_unit.find('.delete-parcel').addClass('display-none');
                     $addBtn.removeClass('display-none');
                 }
             },
             error: function(err) {
-                console.log(err);
+                
+                $parcel_series.removeAttr('disabled');
+                $parcel_unit.find('.edit-parcel').addClass('display-none');
+                $parcel_unit.find('.delete-parcel').addClass('display-none');
+                $addBtn.removeClass('display-none');
+                // show msg
+                if ($toast.css('display') != 'none') return;
+                try {
+                    var msg = JSON.parse(err.response).errmsg; 
+                } catch (e) {
+                    var msg = 'Unknown Error';
+                }
+                $toast.find('.weui-toast__content').text(msg);
+                $toast.fadeIn(100);
+                setTimeout(function () {
+                    $toast.fadeOut(100);
+                }, 2000);
             }
         });
-    });
+    }
 
-    $('.scan-parcel').on('click', function(e) {
-        var $parcel_unit = $(this).closest('.parcel-unit');
+    function scanFunc(el) {
+        var $parcel_unit = $(el).closest('.parcel-unit');
         var $parcel_series = $parcel_unit.find('.parcel-series');
         var $addBtn = $parcel_unit.find('.add-parcel')
         wx.scanQRCode({
@@ -155,11 +190,12 @@
                 $addBtn.removeClass('disabled');
             }
         });
-    });
+    }
     
     var $dialog = $('#androidDialog');
-    $('.delete-parcel').on('click', function(e) {
-        var $parcel_unit = $(this).closest('.parcel-unit');
+    var $toast = $('#toast');
+    function deleteFunc(el) {
+        var $parcel_unit = $(el).closest('.parcel-unit');
         var id = $parcel_unit.data('id');
         if (!id) return;
         
@@ -183,31 +219,31 @@
                 });
             }
         });
-    });
+    }
     
-    $('.edit-parcel').on('click', function(e) {
-        var $parcel_unit = $(this).closest('.parcel-unit');
+    function editFunc(el) {
+        var $parcel_unit = $(el).closest('.parcel-unit');
         var $parcel_series = $parcel_unit.find('.parcel-series');
         $parcel_series.data('series', $parcel_series.val()).removeAttr('disabled').focus();
-        $(this).addClass('display-none');
+        $(el).addClass('display-none');
         $parcel_unit.find('.delete-parcel').addClass('display-none');
         $parcel_unit.find('.save-edit').removeClass('display-none');
         $parcel_unit.find('.cancel-edit').removeClass('display-none');
-    });
+    }
 
-    $('.cancel-edit').on('click', function(e) {
-        var $parcel_unit = $(this).closest('.parcel-unit');
+    function cancelFunc(el) {
+        var $parcel_unit = $(el).closest('.parcel-unit');
         var $parcel_series = $parcel_unit.find('.parcel-series');
         var series = $parcel_series.data('series');
         $parcel_series.attr('disabled', 'disabled').val(series);
-        $(this).addClass('display-none');
+        $(el).addClass('display-none');
         $parcel_unit.find('.delete-parcel').removeClass('display-none');
         $parcel_unit.find('.edit-parcel').removeClass('display-none');
         $parcel_unit.find('.save-edit').addClass('display-none');
-    });
+    }
 
-    $('.save-edit').on('click', function(e) {
-        var $parcel_unit = $(this).closest('.parcel-unit');
+    function saveFunc(el) {
+        var $parcel_unit = $(el).closest('.parcel-unit');
         var $parcel_series = $parcel_unit.find('.parcel-series');
         var id = $parcel_unit.data('id');
         if (!id) return;
@@ -232,7 +268,7 @@
                 console.log(err);
             }
         });
-    });
+    }
     $('.next').click(function(e) {
         var parcels = [];
         $('.parcel-unit[data-id]').each(function(u) {
@@ -242,7 +278,7 @@
         var data = {parcels: parcels, user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc'};
         var $this = $(this);
         var orderId = $parcel_list.data('id');
-        if (orderId) data['_id'] = orderId;
+        if (orderId) data['orderId'] = orderId;
         $.ajax({
             type: "POST",
             dataType: 'json',
@@ -261,6 +297,9 @@
                 console.log(err);
             }
         });
+    });
+    $('.prev').click(function(e) {
+        window.history.back();
     });
 </script>
 {{/section}}

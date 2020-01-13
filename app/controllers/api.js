@@ -6,6 +6,7 @@ const Parcel = mongoose.model('Parcel');
 const Order = mongoose.model('Order');
 const router = express.Router();
 const { WechatClient } = require('messaging-api-wechat');
+const { ParcelStatus } = require('../libs/status');
 
 module.exports = (app) => {
     app.use('/api', router);
@@ -76,12 +77,18 @@ router.post('/order', (req, res, next) => {
     if (req.body.orderId) {
         Order.findByIdAndUpdate(req.body.orderId, req.body, (err, order) => {
             if (err || !order) return res.status(500).send(err);
+            if (order.parcels) {
+                order.parcels.forEach(id => Parcel.findByIdAndUpdate(id, {status: ParcelStatus.Confirm}).exec());
+            }
             return res.status(200).send(order);
         });
     } else {
         const newOrder = new Order(req.body);
         newOrder.save(function (e, order) {
-            if (e) return res.status(500).send(e)
+            if (e) return res.status(500).send(e);
+            if (order && order.parcels) {
+                order.parcels.forEach(id => Parcel.findByIdAndUpdate(id, {status: ParcelStatus.Confirm}).exec());
+            }
             return res.status(200).send(order);
         });
     }
@@ -92,7 +99,7 @@ router.get('/order/:id', (req, res, next) => {
     if (!req.params.id) {
         return res.json({success: 0, msg: '缺少id参数'})
     }
-new RegExp(req.params.id)
+
     Order.find({"$where": `/^${req.params.id}/.test(this._id.str)`}).select('_id').exec((err, order) => {
         if (err) return res.status(500).send(err);
         return res.status(200).send(order);

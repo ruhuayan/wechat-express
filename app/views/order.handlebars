@@ -27,7 +27,7 @@
         color: var(--theme-color);
     }
     ul.status li.active,
-    ul.status li.active ~ li{
+    ul.status li.active ~ li:not(:last-child){
         border-top: 1px solid rgba(0, 0, 0, 0.1);
     }
     ul.status li.active ~ li span {
@@ -63,9 +63,14 @@
                 <div class="weui-media-box weui-media-box_appmsg">
                     <div class="weui-media-box__bd">
                         <h4 class="weui-media-box__title">地址</h4>
+                        {{#if order.address}}
                         <p class="weui-media-box__desc">{{order.address.street}}</p>
                         <p class="weui-media-box__desc">{{order.address.city}}, QC, Canada</p>
                         <p class="weui-media-box__desc">{{order.address.postal}}</p>
+                        {{/if}}
+                        {{#unless order.address}}
+                        <p class="weui-media-box__desc">没有提供地址</p>
+                        {{/unless}}
                     </div>
                     <a href="/order/{{order._id}}/address">
                         <i class="weui-icon-edit"></i>

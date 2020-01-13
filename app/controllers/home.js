@@ -3,13 +3,13 @@ const express = require('express');
 const mongoose = require('mongoose');
 // const request = require('request');
 const User = mongoose.model('User');
-// const Parcel = mongoose.model('Parcel');
+const Parcel = mongoose.model('Parcel');
 const Order = mongoose.model('Order');
 const Address = mongoose.model('Address');
 const router = express.Router();
 const jssdk = require('../libs/jssdk');
 const baseUrl = 'https://e2be9c3e.ngrok.io';
-const {PackageStatus, StatusMessage} = require('../libs/status');
+const {PackageStatus, StatusMessage, ParcelStatus} = require('../libs/status');
 
 module.exports = (app) => {
     app.use('/', router);
@@ -36,9 +36,12 @@ router.get('/',  (req, res) => {
 });
 
 router.get('/register_parcel', (req, res, next) => {
-    res.render('parcel', {
-        title: '包裹登记',
-        signPackage: JSON.stringify(req.signPackage),
+    Parcel.find({user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc', status: ParcelStatus.Create}).exec((err, parcels) => { console.log(parcels)
+        res.render('parcel', {
+            title: '包裹登记',
+            signPackage: JSON.stringify(req.signPackage),
+            parcels,
+        });
     });
 });
 
@@ -68,7 +71,8 @@ router.get('/order/:orderid/parcels', checkOrderId, (req, res, next) => {
         res.render('parcel', {
             title: '填写地址',
             signPackage: JSON.stringify(req.signPackage),
-            order,
+            parcels: order.parcels,
+            orderId: order._id,
         });
     });
 });

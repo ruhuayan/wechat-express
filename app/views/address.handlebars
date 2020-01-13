@@ -1,5 +1,13 @@
 {{#section 'style'}}
 <style>
+    .weui-form__text-area {
+        position: relative;
+    }
+    .edit-address {
+        position: absolute;
+        top: 5px;
+        left: 15px;
+    }
     .weui-form__opr-area {
         text-align: right;
         padding-right: 15px;
@@ -28,15 +36,27 @@
     .add-address.plus::before {
         content: '+';
     }
+    .weui-form__opr-btm {
+        position: fixed;
+        bottom: 4rem;
+        width: 96%;
+        display: flex;
+        justify-content: space-between;
+    }
 </style>
 {{/section}}
 <div class="weui-form">
     <div class="weui-form__text-area">
         <h2 class="weui-form__title">{{title}}</h2>
         <div class="weui-form__desc"></div>
+        {{#if order.address}}
+        <a class="edit-address">
+            <i class="weui-icon-edit"></i>
+        </a>
+        {{/if}}
     </div>
     <div class="weui-form__control-area">
-        <div class="weui-cells__group weui-cells__group_form">
+        <div class="weui-cells weui-cells_form">
             {{#unless order.address}}
                 <div class="weui-panel__bd">
                     {{#each addresses}}
@@ -86,11 +106,12 @@
                         <label class="weui-label">城市:</label>
                     </div>
                     <div class="weui-cell__bd">
-                        <select class="weui-select city" name="city">
+                        <select class="weui-select city" name="city" {{#if order.address}}disabled{{/if}}>
                             <option value="Montreal" {{#ifeq order.address.city 'Montreal'}}selected{{/ifeq}}>Montreal</option>
                             <option value="Longueuil" {{#ifeq order.address.city 'Longueuil'}}selected{{/ifeq}}>Longueuil</option>
                             <option value="Brossard" {{#ifeq order.address.city 'Brossard'}}selected{{/ifeq}}>Brossard</option>
                             <option value="Brossard" {{#ifeq order.address.city 'Laval'}}selected{{/ifeq}}>Laval</option>
+                            <option value="Doval" {{#ifeq order.address.city 'Doval'}}selected{{/ifeq}}>Doval</option>
                             <option value="Quebec" {{#ifeq order.address.city 'Quebec'}}selected{{/ifeq}}>Quebec</option>
                         </select>
                     </div>
@@ -99,14 +120,20 @@
                 <div class="weui-cell"> 
                     <div class="weui-cell__bd"><label class="weui-label">Qc, Canada</label></div>
                     <div class="weui-cell__bd">
-                        <input class="weui-input postal" placeholder="Postal code (邮编)" {{#if order.address}}value="{{order.address.postal}}" disabled{{/if}} required>
+                        <input class="weui-input postal" placeholder="Postal code (邮编)" pattern="([A-Za-z][1-9]){3}" 
+                            {{#if order.address}}value="{{order.address.postal}}" disabled{{/if}} required>
                     </div>
+                </div>
+                <div class="weui-form__opr-area">
+                    <a class="weui-btn weui-btn_primary {{#if order.address}}weui-btn_default{{/if}}" href="javascript:" id="confirm">确定</a>
                 </div>
             </div>
         </div>
     </div>
-    <div class="weui-form__opr-area">
-        <a class="weui-btn weui-btn_primary {{#if order.address}}weui-btn_default{{/if}}" href="javascript:" id="confirm">确定</a>
+    
+    <div class="weui-form__opr-btm">
+        <a class="prev" href="javascript:">< 返回</a>
+        <a class="next" href="javascript:">下一步 ></a>
     </div>
 </div>
 
@@ -114,6 +141,8 @@
 <script>
     var $addressBox = $('.address-box');
     var $form = $('.address-form');
+    var $street = $form.find('.street'),
+        $postal = $form.find('.postal');
 
     $('.add-address').on('click', function(e) {
         $form.toggleClass('display-none');
@@ -125,34 +154,18 @@
         if($(this).val()) $(this).removeClass('error');
     });
 
+    $('.edit-address').on('click', function(e) { console.log(e)
+        $('input').removeAttr('disabled');
+        $('select').removeAttr('disabled');
+    });
+
     $('#confirm').click(function(e) {
-        if ($form.hasClass('display-none')) {
-            var id = $('input[name=radio1]:checked', $addressBox).data('id');
-            if (!id) return;
-            return $.ajax({
-                type: "POST",
-                dataType: 'json',
-                url: '/api/order/{{order._id}}/add_address',
-                data: {address: id},
-                success: function(res) {
-                    console.log(res);
-                    if (res && res._id) {
-                        
-                    } else {
-                        
-                    }
-                },
-                error: function(err) {
-                    console.log(err);
-                }
-            });
-        };
+        
         // create new address
-        var $street = $form.find('.street'),
-            $postal = $form.find('.postal');
         if (!$street.val()) $street.addClass('error');
         if (!$postal.val()) $postal.addClass('error');
-        if ($street.val() && $postal.val()) {
+        if (!new RegExp($postal.attr("pattern")).test($postal.val())) $postal.addClass('error');
+        if ($street.val() && !$postal.hasClass('error')) {
             var data = {
                 street: $street.val(), 
                 postal: $postal.val(), 
@@ -168,9 +181,7 @@
                 success: function(res) {
                     console.log(res);
                     if (res && res._id) {
-                        
-                    } else {
-                        
+                        document.location.href = '/order/{{order._id}}';
                     }
                 },
                 error: function(err) {
@@ -179,5 +190,32 @@
             });
         }
     });
+    $('.prev').click(function(e) {
+        window.history.back();
+    });
+    $('.next').click(function(e) {
+        if ($form.hasClass('display-none')) {
+            var id = $('input[name=radio1]:checked', $addressBox).data('id');
+            if (!id) document.location.href = '/order/{{order._id}}';
+            $.ajax({
+                type: "POST",
+                dataType: 'json',
+                url: '/api/order/{{order._id}}/add_address',
+                data: {address: id},
+                success: function(res) {
+                    console.log(res);
+                    if (res && res._id) {
+                        document.location.href = '/order/{{order._id}}';
+                    } 
+                },
+                error: function(err) {
+                    console.log(err);
+                }
+            });
+        } else {
+            document.location.href = '/order/{{order._id}}';
+        }
+    });
+    
 </script>
 {{/section}}

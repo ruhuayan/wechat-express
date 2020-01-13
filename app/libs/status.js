@@ -23,4 +23,11 @@ const StatusMessage = Object.freeze(
         'Delivered': '已送货'
     }
 );
-module.exports = {PackageStatus, StatusMessage};
+
+const ParcelStatus = Object.freeze(
+    {
+        Create: 'Create',
+        Confirm: 'Confirm'
+    }
+);
+module.exports = {PackageStatus, StatusMessage, ParcelStatus};
