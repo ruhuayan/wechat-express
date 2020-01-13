@@ -8,7 +8,6 @@ const Order = mongoose.model('Order');
 const Address = mongoose.model('Address');
 const router = express.Router();
 const jssdk = require('../libs/jssdk');
-const baseUrl = 'https://e2be9c3e.ngrok.io';
 const {PackageStatus, StatusMessage, ParcelStatus} = require('../libs/status');
 
 module.exports = (app) => {
@@ -16,7 +15,7 @@ module.exports = (app) => {
 };
 // middleware to get singPackage
 router.use((req, res, next) => {
-    jssdk.getSignPackage(`${baseUrl}${req.originalUrl}`, (err, signPackage) => {
+    jssdk.getSignPackage(`${process.env.URL}${req.originalUrl}`, (err, signPackage) => {
         if (err) {
             return next(err);
         }
@@ -36,7 +35,7 @@ router.get('/',  (req, res) => {
 });
 
 router.get('/register_parcel', (req, res, next) => {
-    Parcel.find({user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc', status: ParcelStatus.Create}).exec((err, parcels) => { console.log(parcels)
+    Parcel.find({user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc', status: ParcelStatus.Create}).exec((err, parcels) => {
         res.render('parcel', {
             title: '包裹登记',
             signPackage: JSON.stringify(req.signPackage),
@@ -120,7 +119,7 @@ router.get('/cost-calculate', (req, res, next) => {
 
 router.get('/search', (req, res, next) => {
     res.render('search', {
-        title: '包裹追踪',
+        title: '订单追踪',
         signPackage: JSON.stringify(req.signPackage),
     });
 });

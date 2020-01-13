@@ -54,7 +54,7 @@ const handleWechatEventMessage = (req, res, next) => {
 
     if (event === 'CLICK') {
         if (eventKey === 'package-history') {
-            res.reply(`${baseUrl}/history/${req.user._id.toString()}`);
+            res.reply(`${process.env.URL}/wechat/history/${req.user._id.toString()}`);
         } else {
             res.reply('无法处理的单击事件');
         }

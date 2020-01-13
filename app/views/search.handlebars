@@ -82,6 +82,8 @@
                                     var orderDiv = $('<a class="weui-cell" href="/order/' + order._id +'">' + order._id + '</a>');
                                     $searchResult.append(orderDiv);
                                 });
+                            } else {
+                                $searchResult.append($('<a class="weui-cell">没找到相应的订单</a>'));
                             }
                         },
                     });

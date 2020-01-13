@@ -5,14 +5,13 @@ const Order = mongoose.model('Order');
 const Address = mongoose.model('Address');
 const router = express.Router();
 const jssdk = require('../libs/jssdk');
-const baseUrl = 'https://e2be9c3e.ngrok.io';
 
 module.exports = (app) => {
     app.use('/user', router);
 };
 
 router.use((req, res, next) => {
-    jssdk.getSignPackage(`${baseUrl}${req.originalUrl}`, (err, signPackage) => {
+    jssdk.getSignPackage(`${process.env.URL}${req.originalUrl}`, (err, signPackage) => {
         if (err) {
             return next(err);
         }
