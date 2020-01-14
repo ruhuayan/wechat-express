@@ -97,19 +97,19 @@ router.get('/order/:orderid', checkOrderId, (req, res) => {
 
     Order.findOne({_id: req.params.orderid})
         .populate('address')
-        .populate({path: 'parcels', select:'series'})
+        .populate({path: 'parcels', select:'series status'})
         .exec((err, order) => {
 
         res.render('order', {
             title: '订单',
             signPackage: JSON.stringify(req.signPackage),
             order,
-            status: StatusMessage
+            PackageStatus: PackageStatus
         });
     });
 });
 
-router.get('/warehouse', (req, res, next) => {
+router.get('/warehouse-info', (req, res, next) => {
     res.send('warehouse page');
 });
 

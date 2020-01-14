@@ -1,5 +1,10 @@
 {{#section 'style'}}
 <style>
+    p.parcel-info {
+        display: flex;
+        justify-content: space-between;
+        margin-right: 3em;
+    }
     ul.status {
         display: inline-flex;
         flex-flow: row wrap;
@@ -49,10 +54,13 @@
                     <div class="weui-media-box__bd">
                         <h4 class="weui-media-box__title">包裹号</h4>
                         {{#each order.parcels}}
-                        <p class="weui-media-box__desc">{{series}}</p>
+                        <p class="weui-media-box__desc parcel-info">
+                            <span>{{series}}</span>
+                            <span>{{status}}</span>
+                        </p>
                         {{/each}}
                     </div>
-                    {{#ifeq order.status 'Confirm'}}
+                    {{#ifeq order.status '确认'}}
                     <div class="weui-media-box__ft">
                         <a href="/order/{{order._id}}/parcels">
                             <i class="weui-icon-edit"></i>
@@ -80,8 +88,8 @@
                     <div class="weui-media-box__bd">
                         <h4 class="weui-media-box__title">状态:</h4>
                         <ul class="status">
-                        {{#each status}}
-                            <li class="status-line {{#ifeq @key 'Confirm'}}active{{/ifeq}}">
+                        {{#each PackageStatus}}
+                            <li class="status-line {{#ifeq . '确认'}}active{{/ifeq}}">
                                 <span class="status-tips">{{.}}</span>
                             </li>
                         {{/each}}

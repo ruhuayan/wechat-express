@@ -130,7 +130,7 @@ router.post('/order/:id/add_address', (req, res) => {
     Order.findByIdAndUpdate(req.params.id, {address: req.body.address}, (err, order) => {
         if (err) return res.status(500).send(err);
         if (!order) return res.json({success: 0, msg: '添加地址到`order`失败'});
-        client.sendText(req.body.user, `单号（${req.params.id}）建立成功，要查看请点击 /order/${req.params.id}`).catch(err=> {
+        client.sendText(req.body.user, `单号（${req.params.id}）建立成功，要查看请点击 ${process.env.URL}/order/${req.params.id}`).catch(err=> {
             console.log('wechat client error: ', err)
         });
         return res.status(200).send(order);
@@ -146,7 +146,7 @@ router.post('/order/:id/address', (req, res) => {
         Address.findByIdAndUpdate(req.body._id, req.body, (err, address) => {
             if (err) return res.status(500).send(err);
             if (!address) return res.json({success: 0, msg: `地址更改失败`});
-            client.sendText(req.body.user, `单号（${req.params.id}）更改了送货地址. 查看订单请点击 ${req.host}/order/${req.params.id}`).catch(err=> {
+            client.sendText(req.body.user, `单号（${req.params.id}）更改了送货地址. 查看订单请点击 ${process.env.URL}/order/${req.params.id}`).catch(err=> {
                 console.log('wechat client error: ', err)
             });
             return res.status(200).send(address);
