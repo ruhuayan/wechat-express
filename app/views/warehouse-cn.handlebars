@@ -1,0 +1,262 @@
+{{#section 'style'}}
+<style>
+    .weui-cells_form .weui-cell__ft {
+        text-align: center;
+        font-size: 20px;
+    }
+    .weui-icon-cancel, .weui-icon-success {
+        color: var(--link-color);
+        font-size: 20px;
+    }
+    .weui-toast1 {
+        width: 90%;
+        position: fixed;
+        z-index: 5000;
+        min-height: 4em;
+        left: 5%;
+        background: #eee;
+        text-align: center;
+        border-radius: 5px;
+        color: var(--warn-color);
+    }
+</style>
+{{/section}}
+<div class="weui-form parcel-form">
+    <div class="weui-form__text-area">
+        <h2 class="weui-form__title">{{title}}</h2>
+        <div class="weui-form__desc"></div>
+    </div>
+    <div class="weui-form__control-area">
+        <div class="weui-cells__group weui-cells__group_form">
+            <div class="weui-cells weui-cells_form parcel-list" {{#if orderId}}data-id="{{orderId}}"{{/if}}>
+                {{#each parcels}}
+                    <div class="weui-cell parcel-unit" data-id="{{_id}}">
+                        
+                        <div class="weui-cell__bd">
+                            <input class="weui-input parcel-series" placeholder="填写单号" value="{{series}}" onkeyup="keyupFunc(this)" disabled>
+                        </div>
+                        <div class="weui-cell__ft">
+                            <a class="edit-parcel" onclick="editFunc(this)">
+                                <i class="weui-icon-edit"></i>
+                            </a>
+                            <a class="delete-parcel" onclick="deleteFunc(this)">
+                                <i class="weui-icon-delete"></i>
+                            </a>
+                            <a class="save-edit display-none" onclick="saveFunc(this)">
+                                <i class="weui-icon-success"></i>
+                            </a>
+                            <a class="cancel-edit display-none" onclick="cancelFunc(this)">
+                                <i class="weui-icon-cancel"></i>
+                            </a>
+                        </div>
+                    </div>
+                {{/each}}
+                <div class="weui-cell parcel-unit"> 
+                    <div class="weui-cell__bd">
+                        <input class="weui-input parcel-series" placeholder="填写单号" onkeyup="keyupFunc(this)" >
+                        {{!-- <input class="weui-input parcel-desc" placeholder="简单描述"> --}}
+                    </div>
+                    <div class="weui-cell__ft">
+                        <a class="scan-parcel" onclick="scanFunc(this)">
+                            <i class="weui-icon-scan"></i>
+                        </a>
+                        <a class="add-parcel disabled" onclick="addFunc(this)">
+                            <i class="weui-icon-add"></i>
+                        </a>
+                        <a class="edit-parcel display-none" onclick="editFunc(this)">
+                            <i class="weui-icon-edit"></i>
+                        </a>
+                        <a class="delete-parcel display-none" onclick="deleteFunc(this)">
+                            <i class="weui-icon-delete"></i>
+                        </a>
+                        <a class="save-edit display-none" onclick="saveFunc(this)">
+                            <i class="weui-icon-success"></i>
+                        </a>
+                        <a class="cancel-edit display-none" onclick="cancelFunc(this)">
+                            <i class="weui-icon-cancel"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="js_dialog" id="androidDialog" style="opacity: 0; display: none;">
+    <div class="weui-mask"></div>
+    <div class="weui-dialog weui-skin_android">
+        <div class="weui-dialog__hd"><strong class="weui-dialog__title">删除包裹</strong></div>
+        <div class="weui-dialog__bd">
+            确定删除包裹 <span class="parcelId"></span>?
+        </div>
+        <div class="weui-dialog__ft">
+            <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_default">取消</a>
+            <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary confirm-delete">确定</a>
+        </div>
+    </div>
+</div>
+<div id="toast" style="opacity: 0; display: none;">
+    <div class="weui-mask_transparent"></div>
+    <div class="weui-toast1">
+        <i class="weui-icon-warn"></i>
+        <p class="weui-toast__content"></p>
+    </div>
+</div>
+{{#section 'script'}}
+<script>
+    var $parcel_unit_dom = $('.parcel-unit:not([data-id])').clone();
+    var $parcel_list = $('.parcel-list');
+
+    function keyupFunc(el) {
+        var $addBtn = $(el).closest('.parcel-unit').find('.add-parcel');
+        if ($(el).val()) $addBtn.removeClass('disabled');
+        else $addBtn.addClass('disabled'); 
+    }
+    
+    function addFunc(el) {
+        
+        if ($(el).hasClass('disabled')) return;
+        var $parcel_unit = $(el).closest('.parcel-unit');
+        var $parcel_series = $parcel_unit.find('.parcel-series');
+        var $addBtn = $(el);
+        var data = {series: $parcel_series.val(), user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc'};
+        $parcel_series.attr('disabled', 'disabled');
+        $addBtn.addClass('display-none');
+
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            url: '/api/parcel',
+            data: data,
+            success: function(res) {
+                
+                if (res && res._id) {
+                    $parcel_unit.data('id', res._id);
+                    $parcel_unit.find('.edit-parcel').removeClass('display-none');
+                    $parcel_unit.find('.delete-parcel').removeClass('display-none');
+                    $parcel_unit.find('.scan-parcel').addClass('display-none');
+                    var $newUnit = $parcel_unit_dom.clone();
+                    $parcel_unit.after($newUnit); console.log($newUnit)
+                    $newUnit.find('.parcel-series').focus()
+                } else {
+                    $parcel_series.removeAttr('disabled');
+                    $parcel_unit.find('.edit-parcel').addClass('display-none');
+                    $parcel_unit.find('.delete-parcel').addClass('display-none');
+                    $addBtn.removeClass('display-none');
+                }
+            },
+            error: function(err) {
+                
+                $parcel_series.removeAttr('disabled');
+                $parcel_unit.find('.edit-parcel').addClass('display-none');
+                $parcel_unit.find('.delete-parcel').addClass('display-none');
+                $addBtn.removeClass('display-none');
+                // show msg
+                if ($toast.css('display') != 'none') return;
+                try {
+                    var msg = JSON.parse(err.response).errmsg; 
+                } catch (e) {
+                    var msg = 'Unknown Error';
+                }
+                $toast.find('.weui-toast__content').text(msg);
+                $toast.fadeIn(100);
+                setTimeout(function () {
+                    $toast.fadeOut(100);
+                }, 2000);
+            }
+        });
+    }
+
+    function scanFunc(el) {
+        var $parcel_unit = $(el).closest('.parcel-unit');
+        var $parcel_series = $parcel_unit.find('.parcel-series');
+        var $addBtn = $parcel_unit.find('.add-parcel')
+        wx.scanQRCode({
+            needResult: 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
+            scanType: ["qrCode","barCode"], // 可以指定扫二维码还是一维码，默认二者都有
+            success: function (res) {
+                var result = res.resultStr; // 当needResult 为 1 时，扫码返回的结果
+                $parcel_series.val(result);
+                $addBtn.removeClass('disabled');
+            }
+        });
+    }
+    
+    var $dialog = $('#androidDialog');
+    var $toast = $('#toast');
+    function deleteFunc(el) {
+        var $parcel_unit = $(el).closest('.parcel-unit');
+        var id = $parcel_unit.data('id');
+        if (!id) return;
+        
+        $dialog.fadeIn(200).find('.parcelId').text($parcel_unit.find('.parcel-series').val()); 
+        $dialog.on('click', '.weui-dialog__btn', function(){
+            $dialog.fadeOut(200);
+            $dialog.off('click', '.weui-dialog__btn', null);
+            if ($(this).hasClass('confirm-delete')) {
+                $.ajax({
+                    type: "DELETE",
+                    url: '/api/parcel/' + id,
+                    success: function(res) {
+                        
+                        if (res && res.success) {
+                            $parcel_unit.remove();
+                        }
+                    },
+                    error: function(err) {
+                        console.log(err);
+                    }
+                });
+            }
+        });
+    }
+    
+    function editFunc(el) {
+        var $parcel_unit = $(el).closest('.parcel-unit');
+        var $parcel_series = $parcel_unit.find('.parcel-series');
+        $parcel_series.data('series', $parcel_series.val()).removeAttr('disabled').focus();
+        $(el).addClass('display-none');
+        $parcel_unit.find('.delete-parcel').addClass('display-none');
+        $parcel_unit.find('.save-edit').removeClass('display-none');
+        $parcel_unit.find('.cancel-edit').removeClass('display-none');
+    }
+
+    function cancelFunc(el) {
+        var $parcel_unit = $(el).closest('.parcel-unit');
+        var $parcel_series = $parcel_unit.find('.parcel-series');
+        var series = $parcel_series.data('series');
+        $parcel_series.attr('disabled', 'disabled').val(series);
+        $(el).addClass('display-none');
+        $parcel_unit.find('.delete-parcel').removeClass('display-none');
+        $parcel_unit.find('.edit-parcel').removeClass('display-none');
+        $parcel_unit.find('.save-edit').addClass('display-none');
+    }
+
+    function saveFunc(el) {
+        var $parcel_unit = $(el).closest('.parcel-unit');
+        var $parcel_series = $parcel_unit.find('.parcel-series');
+        var id = $parcel_unit.data('id');
+        if (!id) return;
+        var data = {series: $parcel_series.val(), user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc'};
+        $parcel_series.attr('disabled', 'disabled');
+        var saveBtn = $parcel_unit.find('.save-edit');
+        saveBtn.addClass('display-none');
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            url: '/api/parcel/' + id,
+            data: data,
+            success: function(res) {
+
+                if (res && res._id) {
+                    $parcel_unit.find('.edit-parcel').removeClass('display-none');
+                    $parcel_unit.find('.delete-parcel').removeClass('display-none');
+                    $parcel_unit.find('.cancel-edit').addClass('display-none');
+                } 
+            },
+            error: function(err) {
+                console.log(err);
+            }
+        });
+    }
+</script>
+{{/section}}

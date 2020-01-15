@@ -11,7 +11,7 @@ const jssdk = require('../libs/jssdk');
 const {PackageStatus, ParcelStatus} = require('../libs/status');
 
 module.exports = (app) => {
-    app.use('/warehouse.', router);
+    app.use('/warehouse', router);
 };
 // middleware to get singPackage
 router.use((req, res, next) => {
@@ -25,11 +25,18 @@ router.use((req, res, next) => {
 });
 
 router.get('/',  (req, res) => {
-    Order.find({user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc', status: PackageStatus.Confirm}).exec((err, orders) => {
-        res.render('index', {
-            title: '首页',
+    Order.find({status: PackageStatus.Confirm}).exec((err, orders) => {
+        res.render('warehouse', {
+            title: '仓库管理',
             signPackage: JSON.stringify(req.signPackage),
             orders,
         });
+    });
+});
+
+router.get('/warehouse-cn',  (req, res) => {
+    res.render('warehouse-cn', {
+        title: '进中国仓',
+        signPackage: JSON.stringify(req.signPackage),
     });
 });
