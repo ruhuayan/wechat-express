@@ -34,7 +34,7 @@ router.get('/',  (req, res) => {
     });
 });
 
-router.get('/warehouse-cn',  (req, res) => {
+router.get('/cn',  (req, res) => {
     res.render('warehouse-cn', {
         title: '进中国仓',
         signPackage: JSON.stringify(req.signPackage),

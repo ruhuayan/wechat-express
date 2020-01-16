@@ -172,4 +172,9 @@ router.post('/order/:id/address', (req, res) => {
     }
 });
 
-
+router.post('/parcel/photoById', (req, res) => {
+    console.log(req)
+    if (!req.body.mediaId) {
+        return res.json({success: 0, msg: '缺少id参数'})
+    }
+})

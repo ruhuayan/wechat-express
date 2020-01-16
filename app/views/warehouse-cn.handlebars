@@ -60,20 +60,14 @@
                         <a class="scan-parcel" onclick="scanFunc(this)">
                             <i class="weui-icon-scan"></i>
                         </a>
+                        <a class="camera-parcel" onclick="cameraFunc(this)">
+                            <i class="weui-icon-camera"></i>
+                        </a>
                         <a class="add-parcel disabled" onclick="addFunc(this)">
                             <i class="weui-icon-add"></i>
                         </a>
-                        <a class="edit-parcel display-none" onclick="editFunc(this)">
-                            <i class="weui-icon-edit"></i>
-                        </a>
                         <a class="delete-parcel display-none" onclick="deleteFunc(this)">
                             <i class="weui-icon-delete"></i>
-                        </a>
-                        <a class="save-edit display-none" onclick="saveFunc(this)">
-                            <i class="weui-icon-success"></i>
-                        </a>
-                        <a class="cancel-edit display-none" onclick="cancelFunc(this)">
-                            <i class="weui-icon-cancel"></i>
                         </a>
                     </div>
                 </div>
@@ -210,14 +204,25 @@
         });
     }
     
-    function editFunc(el) {
+    function cameraFunc(el) {
         var $parcel_unit = $(el).closest('.parcel-unit');
         var $parcel_series = $parcel_unit.find('.parcel-series');
-        $parcel_series.data('series', $parcel_series.val()).removeAttr('disabled').focus();
-        $(el).addClass('display-none');
-        $parcel_unit.find('.delete-parcel').addClass('display-none');
-        $parcel_unit.find('.save-edit').removeClass('display-none');
-        $parcel_unit.find('.cancel-edit').removeClass('display-none');
+        // $parcel_series.data('series', $parcel_series.val()).removeAttr('disabled').focus();
+        // $(el).addClass('display-none');
+        // $parcel_unit.find('.delete-parcel').addClass('display-none');
+        // $parcel_unit.find('.save-edit').removeClass('display-none');
+        // $parcel_unit.find('.cancel-edit').removeClass('display-none');
+        wx.chooseImage({
+            count: 2, // 默认9
+            sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+            sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+            success: function (res) {
+                var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                if (localIds) {
+                    wxuploadImage(localIds[0]);
+                }
+            }
+        });
     }
 
     function cancelFunc(el) {
@@ -256,6 +261,32 @@
             error: function(err) {
                 console.log(err);
             }
+        });
+    }
+    function wxuploadImage(id) {
+        wx.uploadImage({
+            localId: id, // 需要上传的图片的本地ID，由chooseImage接口获得
+            isShowProgressTips: 1, // 默认为1，显示进度提示
+            success: function (res) {
+                var mediaId = res.serverId; // 返回图片的服务器端ID
+                if (mediaId) {
+                   uploadPhotoById(mediaId)
+                }
+            },
+            fail: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    function uploadPhotoById(mediaId) {
+        var data = {mediaId: mediaId};
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            url: '/api/parcel/photoById',
+            data: data,
+            success: function(res) {
+            },
         });
     }
 </script>
