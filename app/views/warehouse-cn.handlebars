@@ -5,7 +5,6 @@
         font-size: 20px;
     }
     .weui-icon-cancel, .weui-icon-success {
-        color: var(--link-color);
         font-size: 20px;
     }
     .weui-toast1 {
@@ -35,18 +34,9 @@
                         <div class="weui-cell__bd">
                             <input class="weui-input parcel-series" placeholder="填写单号" value="{{series}}" onkeyup="keyupFunc(this)" disabled>
                         </div>
-                        <div class="weui-cell__ft">
-                            <a class="edit-parcel" onclick="editFunc(this)">
-                                <i class="weui-icon-edit"></i>
-                            </a>
+                        <div class="weui-cell__ft">                      
                             <a class="delete-parcel" onclick="deleteFunc(this)">
                                 <i class="weui-icon-delete"></i>
-                            </a>
-                            <a class="save-edit display-none" onclick="saveFunc(this)">
-                                <i class="weui-icon-success"></i>
-                            </a>
-                            <a class="cancel-edit display-none" onclick="cancelFunc(this)">
-                                <i class="weui-icon-cancel"></i>
                             </a>
                         </div>
                     </div>
@@ -60,11 +50,11 @@
                         <a class="scan-parcel" onclick="scanFunc(this)">
                             <i class="weui-icon-scan"></i>
                         </a>
-                        <a class="camera-parcel" onclick="cameraFunc(this)">
+                        <a class="camera-parcel disabled" onclick="cameraFunc(this)">
                             <i class="weui-icon-camera"></i>
                         </a>
-                        <a class="add-parcel disabled" onclick="addFunc(this)">
-                            <i class="weui-icon-add"></i>
+                        <a class="confirm-parcel disabled" onclick="confirmFunc(this)">
+                            <i class="weui-icon-success"></i>
                         </a>
                         <a class="delete-parcel display-none" onclick="deleteFunc(this)">
                             <i class="weui-icon-delete"></i>
@@ -101,49 +91,59 @@
     var $parcel_list = $('.parcel-list');
 
     function keyupFunc(el) {
-        var $addBtn = $(el).closest('.parcel-unit').find('.add-parcel');
-        if ($(el).val()) $addBtn.removeClass('disabled');
-        else $addBtn.addClass('disabled'); 
+        var $confirmBtn = $(el).closest('.parcel-unit').find('.confirm-parcel');
+        var $cameraBtn = $(el).closest('.parcel-unit').find('.camera-parcel');
+        if ($(el).val()) {
+            $confirmBtn.removeClass('disabled');
+            $cameraBtn.removeClass('disabled');
+        }
+        else {
+            $confirmBtn.addClass('disabled');
+            $cameraBtn.addClass('disabled')
+        }
     }
     
-    function addFunc(el) {
+    function confirmFunc(el) {
         
         if ($(el).hasClass('disabled')) return;
         var $parcel_unit = $(el).closest('.parcel-unit');
         var $parcel_series = $parcel_unit.find('.parcel-series');
-        var $addBtn = $(el);
-        var data = {series: $parcel_series.val(), user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc'};
+        var $confirmBtn = $(el);
+        var parcelSeries = $parcel_series.val();
+        if (!parcelSeries) return; 
+        if (!validateParcel(parcelSeries)) return;
+        var data = {user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc', media: $parcel_unit.data('media')};
         $parcel_series.attr('disabled', 'disabled');
-        $addBtn.addClass('display-none');
+        $confirmBtn.addClass('display-none');
 
         $.ajax({
             type: "POST",
             dataType: 'json',
-            url: '/api/parcel',
+            url: `/api/parcel/${parcelSeries}/receive`,
             data: data,
             success: function(res) {
                 
                 if (res && res._id) {
                     $parcel_unit.data('id', res._id);
-                    $parcel_unit.find('.edit-parcel').removeClass('display-none');
                     $parcel_unit.find('.delete-parcel').removeClass('display-none');
                     $parcel_unit.find('.scan-parcel').addClass('display-none');
+                    $parcel_unit.find('.camera-parcel').addClass('display-none');
                     var $newUnit = $parcel_unit_dom.clone();
-                    $parcel_unit.after($newUnit); console.log($newUnit)
+                    $parcel_unit.after($newUnit);
                     $newUnit.find('.parcel-series').focus()
                 } else {
                     $parcel_series.removeAttr('disabled');
-                    $parcel_unit.find('.edit-parcel').addClass('display-none');
+                    $parcel_unit.find('.camera-parcel').removeClass('display-none');
                     $parcel_unit.find('.delete-parcel').addClass('display-none');
-                    $addBtn.removeClass('display-none');
+                    $confirmBtn.removeClass('display-none');
                 }
             },
             error: function(err) {
                 
                 $parcel_series.removeAttr('disabled');
-                $parcel_unit.find('.edit-parcel').addClass('display-none');
+                $parcel_unit.find('.camera-parcel').removeClass('display-none');
                 $parcel_unit.find('.delete-parcel').addClass('display-none');
-                $addBtn.removeClass('display-none');
+                $confirmBtn.removeClass('display-none');
                 // show msg
                 if ($toast.css('display') != 'none') return;
                 try {
@@ -163,14 +163,19 @@
     function scanFunc(el) {
         var $parcel_unit = $(el).closest('.parcel-unit');
         var $parcel_series = $parcel_unit.find('.parcel-series');
-        var $addBtn = $parcel_unit.find('.add-parcel')
+        var $confirmBtn = $parcel_unit.find('.confirm-parcel');
+        var $cameraBtn = $parcel_unit.find('.camera-parcel');
         wx.scanQRCode({
             needResult: 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
             scanType: ["qrCode","barCode"], // 可以指定扫二维码还是一维码，默认二者都有
             success: function (res) {
                 var result = res.resultStr; // 当needResult 为 1 时，扫码返回的结果
                 $parcel_series.val(result);
-                $addBtn.removeClass('disabled');
+                if (!validateParcel(result)) {
+                    return;
+                };
+                $confirmBtn.removeClass('disabled');
+                $cameraBtn.removeClass('disabled');
             }
         });
     }
@@ -186,13 +191,15 @@
         $dialog.on('click', '.weui-dialog__btn', function(){
             $dialog.fadeOut(200);
             $dialog.off('click', '.weui-dialog__btn', null);
+            var data = {user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc'};
             if ($(this).hasClass('confirm-delete')) {
                 $.ajax({
-                    type: "DELETE",
-                    url: '/api/parcel/' + id,
+                    type: "POST",
+                    url: '/api/parcel/' + id + '/remove',
+                    data: data,
                     success: function(res) {
                         
-                        if (res && res.success) {
+                        if (res && res._id) {
                             $parcel_unit.remove();
                         }
                     },
@@ -205,13 +212,12 @@
     }
     
     function cameraFunc(el) {
+        if ($(el).hasClass('disabled')) return;
         var $parcel_unit = $(el).closest('.parcel-unit');
         var $parcel_series = $parcel_unit.find('.parcel-series');
-        // $parcel_series.data('series', $parcel_series.val()).removeAttr('disabled').focus();
-        // $(el).addClass('display-none');
-        // $parcel_unit.find('.delete-parcel').addClass('display-none');
-        // $parcel_unit.find('.save-edit').removeClass('display-none');
-        // $parcel_unit.find('.cancel-edit').removeClass('display-none');
+        var parcelSeries = $parcel_series.val();
+        if (!parcelSeries) return;
+        
         wx.chooseImage({
             count: 2, // 默认9
             sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
@@ -219,58 +225,21 @@
             success: function (res) {
                 var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
                 if (localIds) {
-                    wxuploadImage(localIds[0]);
+                    wxuploadImage(localIds[0], $parcel_unit);
                 }
             }
         });
     }
 
-    function cancelFunc(el) {
-        var $parcel_unit = $(el).closest('.parcel-unit');
-        var $parcel_series = $parcel_unit.find('.parcel-series');
-        var series = $parcel_series.data('series');
-        $parcel_series.attr('disabled', 'disabled').val(series);
-        $(el).addClass('display-none');
-        $parcel_unit.find('.delete-parcel').removeClass('display-none');
-        $parcel_unit.find('.edit-parcel').removeClass('display-none');
-        $parcel_unit.find('.save-edit').addClass('display-none');
-    }
-
-    function saveFunc(el) {
-        var $parcel_unit = $(el).closest('.parcel-unit');
-        var $parcel_series = $parcel_unit.find('.parcel-series');
-        var id = $parcel_unit.data('id');
-        if (!id) return;
-        var data = {series: $parcel_series.val(), user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc'};
-        $parcel_series.attr('disabled', 'disabled');
-        var saveBtn = $parcel_unit.find('.save-edit');
-        saveBtn.addClass('display-none');
-        $.ajax({
-            type: "POST",
-            dataType: 'json',
-            url: '/api/parcel/' + id,
-            data: data,
-            success: function(res) {
-
-                if (res && res._id) {
-                    $parcel_unit.find('.edit-parcel').removeClass('display-none');
-                    $parcel_unit.find('.delete-parcel').removeClass('display-none');
-                    $parcel_unit.find('.cancel-edit').addClass('display-none');
-                } 
-            },
-            error: function(err) {
-                console.log(err);
-            }
-        });
-    }
-    function wxuploadImage(id) {
+    function wxuploadImage(id, $parcel_unit) {
         wx.uploadImage({
             localId: id, // 需要上传的图片的本地ID，由chooseImage接口获得
             isShowProgressTips: 1, // 默认为1，显示进度提示
             success: function (res) {
                 var mediaId = res.serverId; // 返回图片的服务器端ID
                 if (mediaId) {
-                   uploadPhotoById(mediaId)
+                   // uploadPhotoBySeries(mediaId)
+                   $parcel_unit.data('media', mediaId);
                 }
             },
             fail: function (err) {
@@ -278,16 +247,34 @@
             }
         });
     }
-    function uploadPhotoById(mediaId) {
+    /*function uploadPhotoBySeries(mediaId) {
         var data = {mediaId: mediaId};
         $.ajax({
             type: "POST",
             dataType: 'json',
-            url: '/api/parcel/photoById',
+            url: '/api/parcel/' + series + '/photo',
             data: data,
             success: function(res) {
             },
         });
+    }*/
+
+    function validateParcel(series) {
+        var valid = true;
+        $parcel_list.find('input[disabled').each(function(i, el) {
+            console.log(el.value);
+            if (series == el.value) valid = false;
+        });
+        if (!valid) {
+            // show msg
+            if ($toast.css('display') != 'none') return;
+            $toast.find('.weui-toast__content').text('包裹号 已存在');
+            $toast.fadeIn(100);
+            setTimeout(function () {
+                $toast.fadeOut(100);
+            }, 2000);
+        }
+        return valid;
     }
 </script>
 {{/section}}

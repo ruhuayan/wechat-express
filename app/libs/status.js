@@ -15,7 +15,8 @@ const ParcelStatus = Object.freeze(
     {
         Create: '创建',
         Confirm: '确认',
-        packed: '已装箱',
+        Received: '收到',
+        Packed: '已装箱',
     }
 );
 module.exports = {PackageStatus, ParcelStatus};
