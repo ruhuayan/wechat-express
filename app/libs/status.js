@@ -3,7 +3,7 @@ const PackageStatus = Object.freeze(
         Confirm: '确认',
         InWarehouseCN: '进中国仓',
         InCustomCN: '中国海关',
-        Shipping: '海运',
+        Shipping: '运输中',
         InCustomCA: '加拿大海关',
         InwarehouseCA: '进加拿大仓',
         Delivering: '送货中',
@@ -16,6 +16,12 @@ const ParcelStatus = Object.freeze(
         Create: '创建',
         Confirm: '确认',
         packed: '已装箱',
+        Shipping: '运输中'
     }
 );
-module.exports = {PackageStatus, ParcelStatus};
+
+const Method = Object.freeze({
+    Sea: '海运',
+    Air: '空运'
+});
+module.exports = {PackageStatus, ParcelStatus, Method};

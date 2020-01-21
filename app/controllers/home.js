@@ -9,7 +9,7 @@ const Address = mongoose.model('Address');
 const router = express.Router();
 const jssdk = require('../libs/jssdk');
 const {PackageStatus, StatusMessage, ParcelStatus} = require('../libs/status');
-
+const USER_ID = 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc';
 module.exports = (app) => {
     app.use('/', router);
 };
@@ -34,8 +34,12 @@ router.get('/',  (req, res) => {
     });
 });
 
-router.get('/register_parcel', (req, res, next) => {
-    Parcel.find({user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc', status: ParcelStatus.Create}).exec((err, parcels) => {
+router.get('/register_parcel', async(req, res, next) => {
+    const user = User.findById(USER_ID).exec();
+    if (user && !user.phone) {
+        return res.redirect('/user/profile')
+    }
+    Parcel.find({user: USER_ID, status: ParcelStatus.Create}).exec((err, parcels) => {
         res.render('parcel', {
             title: '包裹登记',
             signPackage: JSON.stringify(req.signPackage),
