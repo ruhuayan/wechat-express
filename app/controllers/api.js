@@ -172,4 +172,36 @@ router.post('/order/:id/address', (req, res) => {
     }
 });
 
+router.post('/parcel/:series/receive', (req, res) => {
+    if (!req.params.series) {
+        return res.json({success: 0, msg: '缺少series参数'})
+    }
+    if (!req.body.user) {
+        return res.json({success: 0, msg: '缺少user参数'});
+    }
 
+    if (req.body.media) {
+        console.log(req.body.media)
+        // download then save media in db
+    }
+    Parcel.findOneAndUpdate({series: req.params.series}, {status: ParcelStatus.Received}, {new: true, upsert: true}, (err, parcel) => {
+        if (err) return res.status(500).send(err);
+        if (!parcel) return res.json({success: 0, msg: `${req.params.series} does not exist`});
+        return res.status(200).send(parcel);
+    });
+});
+
+router.post('/parcel/:id/remove', (req, res) => {
+    if (!req.params.id) {
+        return res.json({success: 0, msg: 'id'});
+    }
+    if (!req.body.user) {
+        return res.json({success: 0, msg: '缺少user参数'});
+    }
+
+    Parcel.findByIdAndUpdate(req.params.id, {status: ParcelStatus.Confirm}, {new: true}, (err, parcel) => {
+        if (err) return res.status(500).send(err);
+        if (!parcel) return res.json({success: 0, msg: `${req.params.id} does not exist`});
+        return res.status(200).send(parcel);
+    });
+});

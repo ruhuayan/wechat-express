@@ -116,6 +116,10 @@ input.weui-input:not([disabled]) {
   content: url(/img/scan.svg);
   width: 20px; }
 
+.weui-icon-camera::before {
+  content: url(/img/camera.svg);
+  width: 20px; }
+
 a.disabled {
   cursor: not-allowed;
   opacity: 0.2; }

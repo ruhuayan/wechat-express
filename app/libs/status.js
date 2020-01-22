@@ -15,8 +15,9 @@ const ParcelStatus = Object.freeze(
     {
         Create: '创建',
         Confirm: '确认',
-        packed: '已装箱',
-        Shipping: '运输中'
+        Received: '收到',
+        Packed: '已装箱',
+        Shipping: '运输中',
     }
 );
 

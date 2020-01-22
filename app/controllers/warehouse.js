@@ -34,9 +34,12 @@ router.get('/',  (req, res) => {
     });
 });
 
-router.get('/warehouse-cn',  (req, res) => {
-    res.render('warehouse-cn', {
-        title: '进中国仓',
-        signPackage: JSON.stringify(req.signPackage),
+router.get('/cn',  (req, res) => {
+    Parcel.find({status: ParcelStatus.Received}).exec((err, parcels) => {
+        res.render('warehouse-cn', {
+            title: '进中国仓',
+            signPackage: JSON.stringify(req.signPackage),
+            parcels,
+        });
     });
 });
