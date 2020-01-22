@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const Address = mongoose.model('Address');
 const User = mongoose.model('User');
 const Parcel = mongoose.model('Parcel');
-const Order = mongoose.model('Order');
+const Package = mongoose.model('Package');
 const router = express.Router();
 const { WechatClient } = require('messaging-api-wechat');
 const { ParcelStatus } = require('../libs/status');
@@ -75,7 +75,7 @@ router.post('/order', (req, res, next) => {
     }
 
     if (req.body.orderId) {
-        Order.findByIdAndUpdate(req.body.orderId, req.body, (err, order) => {
+        Package.findByIdAndUpdate(req.body.orderId, req.body, (err, order) => {
             if (err || !order) return res.status(500).send(err);
             if (order.parcels) {
                 order.parcels.forEach(id => Parcel.findByIdAndUpdate(id, {status: ParcelStatus.Confirm}).exec());
@@ -83,8 +83,8 @@ router.post('/order', (req, res, next) => {
             return res.status(200).send(order);
         });
     } else {
-        const newOrder = new Order(req.body);
-        newOrder.save(function (e, order) {
+        const newPackage = new Package(req.body);
+        newPackage.save(function (e, order) {
             if (e) return res.status(500).send(e);
             if (order && order.parcels) {
                 order.parcels.forEach(id => Parcel.findByIdAndUpdate(id, {status: ParcelStatus.Confirm}).exec());
@@ -100,7 +100,7 @@ router.get('/order/:id', (req, res, next) => {
         return res.json({success: 0, msg: '缺少id参数'})
     }
 
-    Order.find({"$where": `/^${req.params.id}/.test(this._id.str)`}).select('_id').exec((err, order) => {
+    Package.find({"$where": `/^${req.params.id}/.test(this._id.str)`}).select('_id').exec((err, order) => {
         if (err) return res.status(500).send(err);
         return res.status(200).send(order);
     });
@@ -116,7 +116,7 @@ router.post('/order/:id', (req, res, next) => {
         return res.json({success: 0, msg: '缺少user参数'});
     }
 
-    Order.findByIdAndUpdate(req.params.id, req.body, (err, order) => {
+    Package.findByIdAndUpdate(req.params.id, req.body, (err, order) => {
         if (err) return res.status(500).send(err);
         return res.status(200).send(order);
     });
@@ -127,7 +127,7 @@ router.post('/order/:id/add_address', (req, res) => {
     if (!req.params.id) {
         return res.json({success: 0, msg: '缺少id参数'})
     }
-    Order.findByIdAndUpdate(req.params.id, {address: req.body.address}, (err, order) => {
+    Package.findByIdAndUpdate(req.params.id, {address: req.body.address}, (err, order) => {
         if (err) return res.status(500).send(err);
         if (!order) return res.json({success: 0, msg: '添加地址到`order`失败'});
         client.sendText(req.body.user, `单号（${req.params.id}）建立成功，要查看请点击 ${process.env.URL}/order/${req.params.id}`).catch(err=> {
@@ -156,7 +156,7 @@ router.post('/order/:id/address', (req, res) => {
         newAddress.save((err, address) => {
             if (err) return res.status(500).send(err);
             if (!address) return res.json({success: 0, msg: `地址失败`});
-            Order.findByIdAndUpdate(req.params.id, {address: address._id}, (err, order) => {
+            Package.findByIdAndUpdate(req.params.id, {address: address._id}, (err, order) => {
                 if (err) return res.status(500).send(err);
                 if (!order) return res.json({success: 0, msg: '添加地址到`order`失败'});
                 client.sendText(req.body.user, `单号（${req.params.id}）建立成功，要查看请点击 ${req.host}/order/${req.params.id}`).catch(err=> {

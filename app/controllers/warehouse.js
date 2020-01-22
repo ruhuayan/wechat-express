@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 // const request = require('request');
 const User = mongoose.model('User');
 const Parcel = mongoose.model('Parcel');
-const Order = mongoose.model('Order');
+const Package = mongoose.model('Package');
 const Address = mongoose.model('Address');
 const router = express.Router();
 const jssdk = require('../libs/jssdk');
@@ -25,7 +25,7 @@ router.use((req, res, next) => {
 });
 
 router.get('/',  (req, res) => {
-    Order.find({status: PackageStatus.Confirm}).exec((err, orders) => {
+    Package.find({status: PackageStatus.Confirm}).exec((err, orders) => {
         res.render('warehouse', {
             title: '仓库管理',
             signPackage: JSON.stringify(req.signPackage),

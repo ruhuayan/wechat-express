@@ -87,9 +87,11 @@
             </div>
         </div>
     </div>
-    <div class="weui-form__opr-btm">
-        <a class="prev" href="javascript:">< 返回</a>
-        <a class="next" href="javascript:">下一步 ></a>
+    <div class="weui-panel__ft">
+        <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link">
+            <div class="weui-cell__bd">查看你的拼箱</div>
+            <span class="weui-cell__ft"></span>
+        </a>    
     </div>
 </div>
 <div class="js_dialog" id="androidDialog" style="opacity: 0; display: none;">
@@ -269,7 +271,7 @@
             }
         });
     }
-    $('.next').click(function(e) {
+    /*$('.next').click(function(e) {
         var parcels = [];
         $('.parcel-unit[data-id]').each(function(u) {
             parcels.push($(this).data('id'));
@@ -300,6 +302,6 @@
     });
     $('.prev').click(function(e) {
         window.history.back();
-    });
+    });*/
 </script>
 {{/section}}

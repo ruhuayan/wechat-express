@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
-const Order = mongoose.model('Order');
+const Package = mongoose.model('Package');
 const Address = mongoose.model('Address');
 const router = express.Router();
 const jssdk = require('../libs/jssdk');
@@ -22,7 +22,7 @@ router.use((req, res, next) => {
 
 router.get('/orders', (req, res, next) => {
 
-    Order.find({ user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc' }).exec(function (err, orders) {
+    Package.find({ user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc' }).exec(function (err, orders) {
         res.render('user-orders', {
             title: '用户订单',
             signPackage: JSON.stringify(req.signPackage),
@@ -33,15 +33,14 @@ router.get('/orders', (req, res, next) => {
 });
 
 router.get('/profile', (req, res) => {
-    User.findOne({ _id: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc' }).exec( async(err, user) => {
-
-        const addresses = user ? await Address.find({user: user._id}).sort({createdAt: -1}).limit(2).exec() : null;
-
+    User.findOne({ _id: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc' }).populate('address').exec( async(err, user) => {
+        const redirect = req.query.redirect;
+       
         res.render('profile', {
             title: '个人信息',
             signPackage: JSON.stringify(req.signPackage),
             user,
-            addresses
+            redirect
         });
     });
 });

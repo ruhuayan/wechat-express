@@ -1,10 +1,8 @@
 const express = require('express');
-// const moment = require('moment');
 const mongoose = require('mongoose');
-// const request = require('request');
 const User = mongoose.model('User');
 const Parcel = mongoose.model('Parcel');
-const Order = mongoose.model('Order');
+const Package = mongoose.model('Package');
 const Address = mongoose.model('Address');
 const router = express.Router();
 const jssdk = require('../libs/jssdk');
@@ -25,19 +23,19 @@ router.use((req, res, next) => {
 });
 
 router.get('/',  (req, res) => {
-    Order.find({user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc', status: PackageStatus.Confirm}).exec((err, orders) => {
+    Package.find({user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc', status: PackageStatus.Confirm}).exec((err, Packages) => {
         res.render('index', {
             title: '首页',
             signPackage: JSON.stringify(req.signPackage),
-            orders,
+            Packages,
         });
     });
 });
 
 router.get('/register_parcel', async(req, res, next) => {
-    const user = User.findById(USER_ID).exec();
+    const user = await User.findById(USER_ID).exec();
     if (user && !user.phone) {
-        return res.redirect('/user/profile')
+        return res.redirect('/user/profile?redirect=register_parcel')
     }
     Parcel.find({user: USER_ID, status: ParcelStatus.Create}).exec((err, parcels) => {
         res.render('parcel', {
@@ -67,7 +65,7 @@ function orderNotFound(req, res) {
 }
 router.get('/order/:orderid/parcels', checkOrderId, (req, res, next) => {
 
-    Order.findOne({_id: req.params.orderid}).select('_id parcels').populate({ path: 'parcels', select: 'series' }).exec(async(err, order) => {
+    Package.findOne({_id: req.params.orderid}).select('_id parcels').populate({ path: 'parcels', select: 'series' }).exec(async(err, order) => {
         if (err || !order) {
             return orderNotFound(req, res);
         };
@@ -82,7 +80,7 @@ router.get('/order/:orderid/parcels', checkOrderId, (req, res, next) => {
 
 router.get('/order/:orderid/address', checkOrderId, (req, res) => {
     
-    Order.findOne({_id: req.params.orderid}).populate('address').exec(async(err, order) => {
+    Package.findOne({_id: req.params.orderid}).populate('address').exec(async(err, order) => {
         if (err || !order) {
             return orderNotFound(req, res);
         }
@@ -99,7 +97,7 @@ router.get('/order/:orderid/address', checkOrderId, (req, res) => {
 
 router.get('/order/:orderid', checkOrderId, (req, res) => {
 
-    Order.findOne({_id: req.params.orderid})
+    Package.findOne({_id: req.params.orderid})
         .populate('address')
         .populate({path: 'parcels', select:'series status'})
         .exec((err, order) => {
