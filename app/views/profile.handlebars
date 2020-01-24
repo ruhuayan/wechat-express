@@ -1,89 +1,151 @@
 {{#section 'style'}}
 <style>
-    .weui-toast1 {
-        width: 90%;
-        position: fixed;
-        z-index: 5000;
-        min-height: 4em;
-        left: 5%;
-        background: #eee;
-        text-align: center;
-        border-radius: 5px;
-        color: var(--warn-color);
+    .weui-cells__title {
+        color: #000;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+    }
+    .weui-cell__hd label {
+        width: 50px;
+    }
+    .weui-toast-redirect {
+        padding: 15px;
+        min-height: 6em;
     }
 </style>
 {{/section}}
-<div class="weui-form parcel-form">
+<div class="weui-form">
     <div class="weui-form__text-area">
         <h2 class="weui-form__title">{{title}}</h2>
         <div class="weui-form__desc"></div>
     </div>
+    <div class="weui-panel__hd">ID：{{user._id}}</div>
     <div class="weui-form__control-area">
-        <div class="weui-panel_access">
-            {{#if user}}
-            <div class="weui-panel__hd">ID：{{user._id}}</div>
-            <div class="weui-panel__bd">
-                <div class="weui-media-box weui-media-box_appmsg">
-                    <div class="weui-media-box__bd">
-                        <h4 class="weui-media-box__title">个人信息</h4>
-                        
-                        <p class="weui-media-box__desc">无信息</p>
-                        
-                    </div>
-                </div>
-                <div class="weui-media-box weui-media-box_appmsg">
-                        
-                    {{#each addresses}}
-                    <div class="weui-media-box__bd">
-                        <h4 class="weui-media-box__title">地址 {{@index}}</h4>
-                        <p class="weui-media-box__desc">{{street}}</p>
-                        <p class="weui-media-box__desc">{{city}}, QC, Canada</p>
-                        <p class="weui-media-box__desc">{{postal}}</p>
-                    </div>
-                    {{/each}}
-                    {{#unless addresses}}
-                    <p class="weui-media-box__desc">没有提供地址</p>
-                    {{/unless}}
-
-                    <a href="javascript:void(0);">
+        {{#if user}}
+        <div class="weui-cells__group weui-cells__group_form form-group">
+            <div class="weui-cells__title">个人信息
+                <div class="weui-cell_ft">
+                    <a class="edit{{#unless user.phone}} display-none{{/unless}}" onclick="saveFunc(this)">
                         <i class="weui-icon-edit"></i>
+                    </a>
+                    <a class="save-edit disabled{{#if user.phone}} display-none{{/if}}" onclick="saveFunc(this)">
+                        <i class="weui-icon-success"></i>
+                    </a>
+                    <a class="cancel-edit disabled{{#if user.phone}} display-none{{/if}}" onclick="cancelFunc(this)">
+                        <i class="weui-icon-cancel"></i>
                     </a>
                 </div>
             </div>
-            <div class="weui-panel__ft">
-                <a href="/user/orders" class="weui-cell weui-cell_access weui-cell_link">
-                    <div class="weui-cell__bd">查看更多</div>
-                    <span class="weui-cell__ft"></span>
-                </a>    
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">电话:</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input phone" placeholder="Phone (电话)"{{#if user.phone}} value="{{user.phone}}" disabled{{/if}} onkeyup="keyupFunc(this)">
+                </div>
             </div>
-            {{/if}}
-            {{#unless user}}
-            <h4>没有找到用户</h4>
-            {{/unless}}
+            {{!-- <div class="weui-form__opr-area">
+                <a class="weui-btn weui-btn_primary {{#if user.address}}weui-btn_default{{/if}}" href="javascript:" id="confirm">确定</a>
+            </div> --}}
         </div>
+         <div class="weui-cells__group weui-cells__group_form form-group"{{#if user.address}} data-id="{{user.address._id}}"{{/if}}>
+            <div class="weui-cells__title">地址 
+                <div class="weui-cell_ft">
+                    <a class="edit{{#unless user.address}} display-none{{/unless}}" onclick="saveFunc(this)">
+                        <i class="weui-icon-edit"></i>
+                    </a>
+                    <a class="save-edit disabled{{#if user.address}} display-none{{/if}}" onclick="saveFunc(this)">
+                        <i class="weui-icon-success"></i>
+                    </a>
+                    <a class="cancel-edit disabled{{#if user.address}} display-none{{/if}} disabled" onclick="cancelFunc(this)">
+                        <i class="weui-icon-cancel"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">街道:</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input street" placeholder="Street (街道)"
+                        {{#if user.address}}value="{{user.address.street}}" disabled{{/if}} onkeyup="keyupFunc(this)">
+                </div>
+            </div>
+            <div class="weui-cell weui-cell_select weui-cell_select-after">
+                <div class="weui-cell__bd">
+                    <select class="weui-select city" name="city" {{#if user.address}}disabled{{/if}}>
+                        <option value="Montreal" {{#ifeq user.address.city 'Montreal'}}selected{{/ifeq}}>Montreal</option>
+                        <option value="Longueuil" {{#ifeq user.address.city 'Longueuil'}}selected{{/ifeq}}>Longueuil</option>
+                        <option value="Brossard" {{#ifeq user.address.city 'Brossard'}}selected{{/ifeq}}>Brossard</option>
+                        <option value="Brossard" {{#ifeq user.address.city 'Laval'}}selected{{/ifeq}}>Laval</option>
+                        <option value="Doval" {{#ifeq user.address.city 'Doval'}}selected{{/ifeq}}>Doval</option>
+                        <option value="Quebec" {{#ifeq user.address.city 'Quebec'}}selected{{/ifeq}}>Quebec</option>
+                    </select>
+                </div>
+            </div>
+        
+            <div class="weui-cell"> 
+                <div class="weui-cell__bd"><label class="weui-label">Qc, Canada</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input postal" placeholder="Postal code (邮编)" pattern="([A-Za-z][1-9]){3}" 
+                        {{#if user.address}}value="{{user.address.postal}}" disabled{{/if}} required>
+                </div>
+            </div>
+            {{!-- <div class="weui-form__opr-area">
+                <a class="weui-btn weui-btn_primary {{#if user.address}}weui-btn_default{{/if}}" href="javascript:" id="confirm">确定</a>
+            </div> --}}
+        </div>
+        {{/if}}
+        {{#unless user}}
+        <h4>没有找到用户</h4>
+        {{/unless}}
+    </div>
+    <div class="weui-panel__ft">
+        <a href="/user/orders" class="weui-cell weui-cell_access weui-cell_link">
+            <div class="weui-cell__bd">查看更多</div>
+            <span class="weui-cell__ft"></span>
+        </a>    
     </div>
     <div id="toast" style="opacity: 0; display: none;">
         <div class="weui-mask_transparent"></div>
-        <div class="weui-toast1">
-            
+        <div class="weui-toast weui-toast-redirect">
+            <i class="weui-icon-info"></i>
             <p class="weui-toast__content"></p>
         </div>
     </div>
 </div>
 {{#section 'script'}}
 <script>
-
+    var $toast = $('#toast');
+    {{#if redirect}}
     $(document).ready(function() {
-        var $toast = $('#toast');
-        // show msg
-        var msg = 'Unknown Error';
         
-        $toast.find('.weui-toast__content').text(msg);
+        // show msg
+        var msg = '在下单之前<br /> 请确认你已填写了电话和地址';
+        
+        $toast.find('.weui-toast__content').html(msg);
         $toast.fadeIn(100);
         setTimeout(function () {
             $toast.fadeOut(100);
-        }, 2000);
+        }, 2500);
     });
-    
+    {{/if}}
+    function keyupFunc(el) {
+        var $formGroup = $(el).closest('.form-group');
+        var $saveBtn = $formGroup.find('.save-edit');
+        var $cancelBtn = $formGroup.find('.cancel-edit')
+        if ($(el).val()) {
+            $saveBtn.removeClass('disabled');
+            $cancelBtn.removeClass('disabled');
+        } else {
+            $saveBtn.addClass('disabled'); 
+            $cancelBtn.addClass('disabled'); 
+        }
+    }
+
+    function cancelFunc(el) {
+
+    }
+
+    function saveFunc(el) {
+
+    }
 </script>
 {{/section}}

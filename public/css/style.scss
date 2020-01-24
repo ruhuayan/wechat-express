@@ -115,6 +115,9 @@ header {
 .weui-form__control-area {
     margin: 12px 0;
 }
+input.weui-input {
+    padding: 2px 5px;
+}
 input.weui-input:not([disabled]) {
     background: #eee;
 }
