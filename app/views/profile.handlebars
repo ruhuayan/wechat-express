@@ -13,6 +13,9 @@
         padding: 15px;
         min-height: 6em;
     }
+    input.weui-input.error {
+        border: 1px solid red;
+    }
 </style>
 {{/section}}
 <div class="weui-form">
@@ -24,59 +27,40 @@
     <div class="weui-form__control-area">
         {{#if user}}
         <div class="weui-cells__group weui-cells__group_form form-group">
-            <div class="weui-cells__title">个人信息
-                <div class="weui-cell_ft">
-                    <a class="edit{{#unless user.phone}} display-none{{/unless}}" onclick="saveFunc(this)">
-                        <i class="weui-icon-edit"></i>
-                    </a>
-                    <a class="save-edit disabled{{#if user.phone}} display-none{{/if}}" onclick="saveFunc(this)">
-                        <i class="weui-icon-success"></i>
-                    </a>
-                    <a class="cancel-edit disabled{{#if user.phone}} display-none{{/if}}" onclick="cancelFunc(this)">
-                        <i class="weui-icon-cancel"></i>
-                    </a>
+            <div class="weui-cells__title">个人信息</div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">电话*:</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input phone" placeholder="Phone (电话)"{{#if user.phone}} value="{{user.phone}}" disabled{{/if}} onkeyup="keyupFunc(this)" 
+                        name="phone" required>
                 </div>
             </div>
             <div class="weui-cell">
-                <div class="weui-cell__hd"><label class="weui-label">电话:</label></div>
+                <div class="weui-cell__hd"><label class="weui-label">电邮*:</label></div>
                 <div class="weui-cell__bd">
-                    <input class="weui-input phone" placeholder="Phone (电话)"{{#if user.phone}} value="{{user.phone}}" disabled{{/if}} onkeyup="keyupFunc(this)">
+                    <input class="weui-input email" placeholder="Email (电话)"{{#if user.email}} value="{{user.email}}" disabled{{/if}} onkeyup="keyupFunc(this)" 
+                        name="email" required>
                 </div>
             </div>
-            {{!-- <div class="weui-form__opr-area">
-                <a class="weui-btn weui-btn_primary {{#if user.address}}weui-btn_default{{/if}}" href="javascript:" id="confirm">确定</a>
-            </div> --}}
         </div>
-         <div class="weui-cells__group weui-cells__group_form form-group"{{#if user.address}} data-id="{{user.address._id}}"{{/if}}>
-            <div class="weui-cells__title">地址 
-                <div class="weui-cell_ft">
-                    <a class="edit{{#unless user.address}} display-none{{/unless}}" onclick="saveFunc(this)">
-                        <i class="weui-icon-edit"></i>
-                    </a>
-                    <a class="save-edit disabled{{#if user.address}} display-none{{/if}}" onclick="saveFunc(this)">
-                        <i class="weui-icon-success"></i>
-                    </a>
-                    <a class="cancel-edit disabled{{#if user.address}} display-none{{/if}} disabled" onclick="cancelFunc(this)">
-                        <i class="weui-icon-cancel"></i>
-                    </a>
-                </div>
-            </div>
+        <div class="weui-cells__group weui-cells__group_form form-group">
+            <div class="weui-cells__title">地址</div>
             <div class="weui-cell">
                 <div class="weui-cell__hd"><label class="weui-label">街道:</label></div>
                 <div class="weui-cell__bd">
-                    <input class="weui-input street" placeholder="Street (街道)"
-                        {{#if user.address}}value="{{user.address.street}}" disabled{{/if}} onkeyup="keyupFunc(this)">
+                    <input class="weui-input street" placeholder="Street (街道)" name="street"
+                        {{#if user.street}}value="{{user.street}}" disabled{{/if}} onkeyup="keyupFunc(this)" required>
                 </div>
             </div>
             <div class="weui-cell weui-cell_select weui-cell_select-after">
                 <div class="weui-cell__bd">
-                    <select class="weui-select city" name="city" {{#if user.address}}disabled{{/if}}>
-                        <option value="Montreal" {{#ifeq user.address.city 'Montreal'}}selected{{/ifeq}}>Montreal</option>
-                        <option value="Longueuil" {{#ifeq user.address.city 'Longueuil'}}selected{{/ifeq}}>Longueuil</option>
-                        <option value="Brossard" {{#ifeq user.address.city 'Brossard'}}selected{{/ifeq}}>Brossard</option>
-                        <option value="Brossard" {{#ifeq user.address.city 'Laval'}}selected{{/ifeq}}>Laval</option>
-                        <option value="Doval" {{#ifeq user.address.city 'Doval'}}selected{{/ifeq}}>Doval</option>
-                        <option value="Quebec" {{#ifeq user.address.city 'Quebec'}}selected{{/ifeq}}>Quebec</option>
+                    <select class="weui-select city" name="city" {{#if user.city}}disabled{{/if}}>
+                        <option value="Montreal" {{#ifeq user.city 'Montreal'}}selected{{/ifeq}}>Montreal</option>
+                        <option value="Longueuil" {{#ifeq user.city 'Longueuil'}}selected{{/ifeq}}>Longueuil</option>
+                        <option value="Brossard" {{#ifeq user.city 'Brossard'}}selected{{/ifeq}}>Brossard</option>
+                        <option value="Brossard" {{#ifeq user.city 'Laval'}}selected{{/ifeq}}>Laval</option>
+                        <option value="Doval" {{#ifeq user.city 'Doval'}}selected{{/ifeq}}>Doval</option>
+                        <option value="Quebec" {{#ifeq user.city 'Quebec'}}selected{{/ifeq}}>Quebec</option>
                     </select>
                 </div>
             </div>
@@ -84,25 +68,33 @@
             <div class="weui-cell"> 
                 <div class="weui-cell__bd"><label class="weui-label">Qc, Canada</label></div>
                 <div class="weui-cell__bd">
-                    <input class="weui-input postal" placeholder="Postal code (邮编)" pattern="([A-Za-z][1-9]){3}" 
-                        {{#if user.address}}value="{{user.address.postal}}" disabled{{/if}} required>
+                    <input class="weui-input postal" placeholder="Postal code (邮编)*" name="postal"
+                        onkeyup="keyupFunc(this)" {{#if user.postal}}value="{{user.postal}}" disabled{{/if}} required>
                 </div>
             </div>
-            {{!-- <div class="weui-form__opr-area">
-                <a class="weui-btn weui-btn_primary {{#if user.address}}weui-btn_default{{/if}}" href="javascript:" id="confirm">确定</a>
-            </div> --}}
+        </div>
+        <div class="weui-cell_ft weui-cell">
+            <a class="edit{{#unless user.phone}} display-none{{/unless}}" onclick="FormGroup.editFunc(this)">
+                <i class="weui-icon-edit"></i>
+            </a>
+            <a class="save-edit disabled{{#if user.phone}} display-none{{/if}}" onclick="FormGroup.saveFunc(this)">
+                <i class="weui-icon-success"></i>
+            </a>
+            <a class="cancel-edit disabled{{#if user.phone}} display-none{{/if}} disabled" onclick="FormGoup.cancelFunc(this)">
+                <i class="weui-icon-cancel"></i>
+            </a>
         </div>
         {{/if}}
         {{#unless user}}
         <h4>没有找到用户</h4>
         {{/unless}}
     </div>
-    <div class="weui-panel__ft">
+    {{!-- <div class="weui-panel__ft">
         <a href="/user/orders" class="weui-cell weui-cell_access weui-cell_link">
             <div class="weui-cell__bd">查看更多</div>
             <span class="weui-cell__ft"></span>
         </a>    
-    </div>
+    </div> --}}
     <div id="toast" style="opacity: 0; display: none;">
         <div class="weui-mask_transparent"></div>
         <div class="weui-toast weui-toast-redirect">
@@ -114,6 +106,7 @@
 {{#section 'script'}}
 <script>
     var $toast = $('#toast');
+
     {{#if redirect}}
     $(document).ready(function() {
         
@@ -127,25 +120,131 @@
         }, 2500);
     });
     {{/if}}
-    function keyupFunc(el) {
-        var $formGroup = $(el).closest('.form-group');
-        var $saveBtn = $formGroup.find('.save-edit');
-        var $cancelBtn = $formGroup.find('.cancel-edit')
-        if ($(el).val()) {
-            $saveBtn.removeClass('disabled');
-            $cancelBtn.removeClass('disabled');
-        } else {
-            $saveBtn.addClass('disabled'); 
-            $cancelBtn.addClass('disabled'); 
+    var FormGroup = (function(){
+        var controls = {
+            phone: {
+                reg: /\d{10,13}/g,
+                required: true,
+                invalid: true,
+                err: 'Phone is invalid',
+            },
+            email: {
+                reg: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/g,
+                required: true,
+                invalid: true,
+                err: 'Email is invalid'
+            },
+            street: {
+                required: true,
+                invalid: true,
+            },
+            city: {
+                required: false,
+                invalid: false,
+            },
+            postal: {
+                reg: /([A-Za-z][1-9][A-Za-z])(\s){0,1}([1-9][A-Za-z][1-9])/g,
+                required: true,
+                invalid: true,
+                err: 'Postal is invalid'
+            }
+        };
+        var $editBtn = $('.edit'), $cancelBtn = $('.cancel-edit'), $saveBtn = $('.save-edit');
+        function _validateControl(name) {
+            var $control = $('input[name=' + name + ']').length ? $('input[name=' + name + ']'): $('select[name=' + name + ']');
+            var control = controls[name];
+            if (control.required && !$control.val()) {
+                control.invalid = true;
+            } else {
+                control.invalid = false;
+            }
+            if (control.reg && !control.reg.test($control.val())) {
+                control.invalid = true;
+            } else {
+                control.invalid = false;
+            }
+            if (control.invalid) {
+                $control.addClass('error');
+            } else {
+                $control.removeClass('error');
+            }
         }
+        function _validate() {
+            return Object.values(controls).every(control => control['invalid'] === false);
+        }
+        function validateForm() {
+            
+            if (_validate()) {
+                $saveBtn.removeClass('disabled');
+                $cancelBtn.removeClass('disabled');
+            } else {
+                $saveBtn.addClass('disabled'); 
+                $cancelBtn.addClass('disabled'); 
+            }
+        }
+
+        function _getFormValues() {
+            return Object.keys(controls).reduce(function(acc, cur) {
+                return {...acc, [cur]: $('input[name=' + cur + ']').length ? $('input[name=' + cur + ']').val(): $('select[name=' + cur + ']').val() } 
+            }, {});
+        }
+
+        function keyupFunc(el) {
+            var name = $(el).attr('name');
+            
+            _validateControl(name);
+            this.validateForm();
+        }
+        function _toggelEdit() {
+            if ($editBtn.hasClass('display-none')) {
+                $editBtn.removeClass('display-none');
+                $saveBtn.addClass('display-none');
+                $cancelBtn.addClass('display-none');
+            } else {
+                $editBtn.addClass('display-none');
+                $saveBtn.removeClass('display-none');
+                $cancelBtn.removeClass('display-none');
+            }
+        }
+        function editFunc(e) {
+            Object.keys(controls).forEach(function(control) {
+                $('input[name=' + control + ']').length? $('input[name=' + control + ']').removeAttr('disabled'): $('select[name=' + control + ']').removeAttr('disabled');
+                _validateControl(control);
+            });
+            this.validateForm();
+            _toggelEdit();
+        }
+        function cancelFunc(e) {
+
+        }
+        function saveFunc(e) {
+            if (!_validate()) return;
+            var data = _getFormValues();
+            $.ajax({
+                type: "POST",
+                dataType: 'json',
+                url: '/api/users/{{user._id}}',
+                data: data,
+                success: function(res) {
+                    console.log(res);
+                    _toggelEdit();
+                },
+                error: function(err) {
+                    console.log(err);
+                }
+            });
+        }
+        return {
+            validateForm: validateForm,
+            keyupFunc: keyupFunc,
+            saveFunc: saveFunc,
+            editFunc: editFunc,
+            cancelFunc: cancelFunc
+        };
+    }());
+    function keyupFunc(el) {
+        FormGroup.keyupFunc(el);
     }
 
-    function cancelFunc(el) {
-
-    }
-
-    function saveFunc(el) {
-
-    }
 </script>
 {{/section}}

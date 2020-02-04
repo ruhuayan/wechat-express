@@ -205,3 +205,19 @@ router.post('/parcel/:id/remove', (req, res) => {
         return res.status(200).send(parcel);
     });
 });
+
+router.post('/users/:id', (req, res) => {
+    if (!req.params.id) {
+        return res.json({success: 0, msg: '缺少userId参数'});
+    }
+    if (!req.body.phone) {
+        return res.json({success: 0, msg: '缺少phone参数'});
+    }
+
+    User.findByIdAndUpdate(req.params.id, req.body, (err, user) => {
+        if (err) return res.status(500).send(err);
+        if (!user) return res.json({success: 0, msg: `user - ${req.params.id} does not exist`});
+        return res.status(200).send(user);
+    });
+
+});
