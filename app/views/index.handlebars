@@ -55,20 +55,20 @@
 </div>
 
 <div class="page__bd">
-    <div class="weui-cells__title">你目前的拼箱：</div>
+    <div class="weui-cells__title">你目前的装箱：</div>
     <div class="weui-cells">
-        {{#each orders}}
+        {{#each packages}}
         <div class="weui-cell">
             <div class="weui-cell__bd">
                 <p>{{_id}}</p>
             </div>
             <div class="weui-cell__ft">
-                <a href="/order/{{_id}}">查看</a>
+                <a href="/package/{{_id}}">查看</a>
             </div>
         </div>
         {{/each}}
-        {{#unless orders}} 
-        <div class="weui-cells__title">无拼箱</div>
+        {{#unless packages}} 
+        <div class="weui-cells__title">无装箱</div>
         {{/unless}}
     </div>
 </div>

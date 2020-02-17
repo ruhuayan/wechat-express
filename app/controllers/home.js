@@ -23,11 +23,11 @@ router.use((req, res, next) => {
 });
 
 router.get('/',  (req, res) => {
-    Package.find({user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc', status: PackageStatus.Confirm}).exec((err, Packages) => {
+    Package.find({user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc', status: PackageStatus.Confirm}).exec((err, packages) => {
         res.render('index', {
             title: '首页',
             signPackage: JSON.stringify(req.signPackage),
-            Packages,
+            packages,
         });
     });
 });
@@ -37,7 +37,7 @@ router.get('/register_parcel', async(req, res, next) => {
     if (user && !user.phone) {
         return res.redirect('/user/profile?redirect=register_parcel')
     }
-    Parcel.find({user: USER_ID, status: ParcelStatus.Create}).exec((err, parcels) => {
+    Parcel.find({user: USER_ID, status: { $in: [ ParcelStatus.Create, ParcelStatus.Received ] }}).exec((err, parcels) => {
         res.render('parcel', {
             title: '包裹登记',
             signPackage: JSON.stringify(req.signPackage),
@@ -46,10 +46,10 @@ router.get('/register_parcel', async(req, res, next) => {
     });
 });
 
-function checkOrderId(req, res, next) {
-    if (!req.params.orderid) {
+function checkPackageId(req, res, next) {
+    if (!req.params.pid) {
         const matches = req.url.match(/(parcel)|(address)/g);
-        const viewUrl = matches.length? matches[0] : 'order';
+        const viewUrl = matches.length? matches[0] : 'package';
         return res.render(viewUrl, {
             title: '缺少userid参数',
             signPackage: JSON.stringify(req.signPackage),
@@ -57,55 +57,55 @@ function checkOrderId(req, res, next) {
     } else next();
 }
 
-function orderNotFound(req, res) {
-    return res.render('order', {
-        title: '订单',
-        signPackage: JSON.stringify(req.signPackage),
-    });
-}
-router.get('/order/:orderid/parcels', checkOrderId, (req, res, next) => {
+// function orderNotFound(req, res) {
+//     return res.render('order', {
+//         title: '订单',
+//         signPackage: JSON.stringify(req.signPackage),
+//     });
+// }
+// router.get('/order/:orderid/parcels', checkPackageId, (req, res, next) => {
 
-    Package.findOne({_id: req.params.orderid}).select('_id parcels').populate({ path: 'parcels', select: 'series' }).exec(async(err, order) => {
-        if (err || !order) {
-            return orderNotFound(req, res);
-        };
-        res.render('parcel', {
-            title: '填写地址',
-            signPackage: JSON.stringify(req.signPackage),
-            parcels: order.parcels,
-            orderId: order._id,
-        });
-    });
-});
+//     Package.findOne({_id: req.params.orderid}).select('_id parcels').populate({ path: 'parcels', select: 'series' }).exec(async(err, order) => {
+//         if (err || !order) {
+//             return orderNotFound(req, res);
+//         };
+//         res.render('parcel', {
+//             title: '填写地址',
+//             signPackage: JSON.stringify(req.signPackage),
+//             parcels: order.parcels,
+//             orderId: order._id,
+//         });
+//     });
+// });
 
-router.get('/order/:orderid/address', checkOrderId, (req, res) => {
+// router.get('/order/:orderid/address', checkPackageId, (req, res) => {
     
-    Package.findOne({_id: req.params.orderid}).populate('address').exec(async(err, order) => {
-        if (err || !order) {
-            return orderNotFound(req, res);
-        }
-        const addresses = order.address? null : await Address.find({user: order.user}).sort({createdAt: -1}).limit(2).exec();
+//     Package.findOne({_id: req.params.orderid}).populate('address').exec(async(err, order) => {
+//         if (err || !order) {
+//             return orderNotFound(req, res);
+//         }
+//         const addresses = order.address? null : await Address.find({user: order.user}).sort({createdAt: -1}).limit(2).exec();
         
-        res.render('address', {
-            title: '填写地址',
-            signPackage: JSON.stringify(req.signPackage),
-            order,
-            addresses,
-        });
-    });
-});
+//         res.render('address', {
+//             title: '填写地址',
+//             signPackage: JSON.stringify(req.signPackage),
+//             order,
+//             addresses,
+//         });
+//     });
+// });
 
-router.get('/order/:orderid', checkOrderId, (req, res) => {
+router.get('/package/:pid', checkPackageId, (req, res) => {
 
-    Package.findOne({_id: req.params.orderid})
-        .populate('address')
+    Package.findOne({_id: req.params.pid})
+        .populate('user')
         .populate({path: 'parcels', select:'series status'})
-        .exec((err, order) => {
+        .exec((err, package) => {
 
-        res.render('order', {
-            title: '订单',
+        res.render('package', {
+            title: '装箱',
             signPackage: JSON.stringify(req.signPackage),
-            order,
+            package,
             PackageStatus: PackageStatus
         });
     });

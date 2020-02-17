@@ -6,7 +6,7 @@ const Parcel = mongoose.model('Parcel');
 const Package = mongoose.model('Package');
 const router = express.Router();
 const { WechatClient } = require('messaging-api-wechat');
-const { ParcelStatus } = require('../libs/status');
+const { ParcelStatus, PackageStatus } = require('../libs/status');
 
 module.exports = (app) => {
     app.use('/api', router);
@@ -28,7 +28,7 @@ router.post('/parcel', (req, res, next) => { console.log(req.body)
     // }
     const newParcel = new Parcel(req.body);
     newParcel.save(function (e, parcel) {
-        if (e) return res.status(500).send(e)
+        if (e || !parcel) return res.status(500).send({success: 0, msg: 'Create parcel error'});
         return res.status(200).send(parcel);
     });
 
@@ -55,10 +55,11 @@ router.delete('/parcel/:id', (req, res, next) =>{
     if (!req.params.id) {
         return res.json({success: 0, msg: '缺少id参数'})
     }
-    Parcel.findByIdAndRemove(req.params.id, (err, parcel) => { console.log(err)
+    // only parcel with status 'Created' can be deleted 
+    Parcel.findOneAndRemove({_id: req.params.id, status: ParcelStatus.Create}, (err, parcel) => {
         
         if (err) return res.status(500).send(err);
-        if (!parcel) return res.json({success: 0, msg: `${req.params.id} does not exist`});
+        if (!parcel) return res.json({success: 0, msg: `${req.params.id} does not exist or cannot be removed `});
         const response = {
             success: 1,
             message: "Parcel successfully deleted",
@@ -68,46 +69,46 @@ router.delete('/parcel/:id', (req, res, next) =>{
     });
 });
 
-// add order 
-router.post('/order', (req, res, next) => {
-    if (!req.body.user) {
-        return res.json({success: 0, msg: '缺少user参数'});
-    }
+// add package 
+// router.post('/package', (req, res, next) => {
+//     if (!req.body.user) {
+//         return res.json({success: 0, msg: '缺少user参数'});
+//     }
 
-    if (req.body.orderId) {
-        Package.findByIdAndUpdate(req.body.orderId, req.body, (err, order) => {
-            if (err || !order) return res.status(500).send(err);
-            if (order.parcels) {
-                order.parcels.forEach(id => Parcel.findByIdAndUpdate(id, {status: ParcelStatus.Confirm}).exec());
-            }
-            return res.status(200).send(order);
-        });
-    } else {
-        const newPackage = new Package(req.body);
-        newPackage.save(function (e, order) {
-            if (e) return res.status(500).send(e);
-            if (order && order.parcels) {
-                order.parcels.forEach(id => Parcel.findByIdAndUpdate(id, {status: ParcelStatus.Confirm}).exec());
-            }
-            return res.status(200).send(order);
-        });
-    }
-});
+//     if (req.body.packageId) {
+//         Package.findByIdAndUpdate(req.body.packageId, req.body, (err, package) => {
+//             if (err || !package) return res.status(500).send(err);
+//             if (package.parcels) {
+//                 package.parcels.forEach(id => Parcel.findByIdAndUpdate(id, {status: ParcelStatus.Confirm}).exec());
+//             }
+//             return res.status(200).send(package);
+//         });
+//     } else {
+//         const newPackage = new Package(req.body);
+//         newPackage.save(function (e, package) {
+//             if (e) return res.status(500).send(e);
+//             if (package && package.parcels) {
+//                 package.parcels.forEach(id => Parcel.findByIdAndUpdate(id, {status: ParcelStatus.Confirm}).exec());
+//             }
+//             return res.status(200).send(package);
+//         });
+//     }
+// });
 
 // search order
-router.get('/order/:id', (req, res, next) => {
+router.get('/package/:id', (req, res, next) => {
     if (!req.params.id) {
         return res.json({success: 0, msg: '缺少id参数'})
     }
 
-    Package.find({"$where": `/^${req.params.id}/.test(this._id.str)`}).select('_id').exec((err, order) => {
+    Package.find({"$where": `/^${req.params.id}/.test(this._id.str)`}).select('_id').exec((err, packages) => {
         if (err) return res.status(500).send(err);
-        return res.status(200).send(order);
+        return res.status(200).send(packages);
     });
 });
 
 // edit order
-router.post('/order/:id', (req, res, next) => {
+router.post('/package/:id', (req, res, next) => {
     if (!req.params.id) {
         return res.json({success: 0, msg: '缺少id参数'})
     }
@@ -116,26 +117,23 @@ router.post('/order/:id', (req, res, next) => {
         return res.json({success: 0, msg: '缺少user参数'});
     }
 
-    Package.findByIdAndUpdate(req.params.id, req.body, (err, order) => {
+    Package.findByIdAndUpdate(req.params.id, req.body, (err, package) => {
         if (err) return res.status(500).send(err);
-        return res.status(200).send(order);
+        return res.status(200).send(package);
     });
 });
 
 // add address to order
-router.post('/order/:id/add_address', (req, res) => {
-    if (!req.params.id) {
-        return res.json({success: 0, msg: '缺少id参数'})
-    }
-    Package.findByIdAndUpdate(req.params.id, {address: req.body.address}, (err, order) => {
-        if (err) return res.status(500).send(err);
-        if (!order) return res.json({success: 0, msg: '添加地址到`order`失败'});
-        client.sendText(req.body.user, `单号（${req.params.id}）建立成功，要查看请点击 ${process.env.URL}/order/${req.params.id}`).catch(err=> {
-            console.log('wechat client error: ', err)
-        });
-        return res.status(200).send(order);
-    }); 
-});
+// router.post('/package/:id/add_address', (req, res) => {
+//     if (!req.params.id) {
+//         return res.json({success: 0, msg: '缺少id参数'})
+//     }
+//     Package.findByIdAndUpdate(req.params.id, {address: req.body.address}, (err, package) => {
+//         if (err) return res.status(500).send(err);
+//         if (!order) return res.json({success: 0, msg: '添加地址到`order`失败'});
+//         return res.status(200).send(package);
+//     }); 
+// });
 // create address then add to order or edit order address, 
 router.post('/order/:id/address', (req, res) => {
     if (!req.params.id) {
@@ -172,6 +170,7 @@ router.post('/order/:id/address', (req, res) => {
     }
 });
 
+// when a parcel is received, find or create a package to put it
 router.post('/parcel/:series/receive', (req, res) => {
     if (!req.params.series) {
         return res.json({success: 0, msg: '缺少series参数'})
@@ -179,14 +178,27 @@ router.post('/parcel/:series/receive', (req, res) => {
     if (!req.body.user) {
         return res.json({success: 0, msg: '缺少user参数'});
     }
-
-    if (req.body.media) {
-        console.log(req.body.media)
-        // download then save media in db
-    }
-    Parcel.findOneAndUpdate({series: req.params.series}, {status: ParcelStatus.Received}, {new: true, upsert: true}, (err, parcel) => {
-        if (err) return res.status(500).send(err);
+    // find or create package
+    Package.findOneOrCreate({user: req.body.user, status: PackageStatus.Confirm}, async(err, package) => {
+        if (err || !package) return res.json({success: 0, msg: '`package` create失败'});
+        
+        let parcel = await Parcel.findOne({series: req.params.series});
         if (!parcel) return res.json({success: 0, msg: `${req.params.series} does not exist`});
+
+        package.parcels.push(parcel._id);
+        const p = await package.save();
+        if (!p) return res.json({success: 0, msg: '`package` save 失败'});
+
+        parcel.status = ParcelStatus.Received;
+        parcel.package = package._id;
+        parcel = await parcel.save();
+        if (!parcel) return res.json({success: 0, msg: '`parcel` update 失败'});
+
+        // send wechat message
+        client.sendText(package.user, `单号（${package._id}）建立成功，要查看请点击 ${process.env.URL}/package/${package._id}`).catch(err=> {
+            console.log('wechat client error: ', err)
+        });
+
         return res.status(200).send(parcel);
     });
 });
@@ -195,15 +207,26 @@ router.post('/parcel/:id/remove', (req, res) => {
     if (!req.params.id) {
         return res.json({success: 0, msg: 'id'});
     }
-    if (!req.body.user) {
-        return res.json({success: 0, msg: '缺少user参数'});
+    if (!req.body.user || !req.body.pid) {
+        return res.json({success: 0, msg: '缺少user参数 or package id'});
     }
 
-    Parcel.findByIdAndUpdate(req.params.id, {status: ParcelStatus.Confirm}, {new: true}, (err, parcel) => {
-        if (err) return res.status(500).send(err);
-        if (!parcel) return res.json({success: 0, msg: `${req.params.id} does not exist`});
+    Package.findById(req.body.pid, async(err, package) => {
+        if (err || !package) return res.json({success: 0, msg: '`package` find 失败'});
+
+        let parcel = await Parcel.findById(req.params.id);
+        if (!parcel) return res.json({success: 0, msg: `${req.params.series} does not exist`});
+
+        package.parcels = package.parcels.filter(p => p != req.params.id);
+        const p = await package.save();
+        if (!p) return res.json({success: 0, msg: '`package` save 失败'});
+
+        parcel.package = null;
+        parcel.status = ParcelStatus.Create;
+        if (!parcel) return res.json({success: 0, msg: '`parcel` update 失败'});
         return res.status(200).send(parcel);
     });
+    
 });
 
 router.post('/users/:id', (req, res) => {

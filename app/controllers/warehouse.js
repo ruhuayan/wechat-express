@@ -1,7 +1,6 @@
 const express = require('express');
 // const moment = require('moment');
 const mongoose = require('mongoose');
-// const request = require('request');
 const User = mongoose.model('User');
 const Parcel = mongoose.model('Parcel');
 const Package = mongoose.model('Package');

@@ -25,7 +25,13 @@ header {
   width: 100%;
   padding: 10px 0px;
   font-weight: bold;
-  font-size: 1rem; }
+  font-size: 1rem;
+  z-index: 100; }
+
+.weui-footer_fixed-bottom {
+  bottom: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.9); }
 
 .menu__icon {
   margin-left: 10px;

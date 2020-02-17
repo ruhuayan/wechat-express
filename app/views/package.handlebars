@@ -47,42 +47,35 @@
     </div>
     <div class="weui-form__control-area">
         <div class="weui-panel_access">
-            {{#if order}}
-            <div class="weui-panel__hd">单号：{{order._id}}</div>
+            {{#if package}}
+            <div class="weui-panel__hd">箱号：{{package._id}}</div>
             <div class="weui-panel__bd">
                 <div class="weui-media-box weui-media-box_appmsg">
                     <div class="weui-media-box__bd">
                         <h4 class="weui-media-box__title">包裹号</h4>
-                        {{#each order.parcels}}
+                        {{#each package.parcels}}
                         <p class="weui-media-box__desc parcel-info">
                             <span>{{series}}</span>
                             <span>{{status}}</span>
                         </p>
                         {{/each}}
                     </div>
-                    {{#ifeq order.status '确认'}}
-                    <div class="weui-media-box__ft">
-                        <a href="/order/{{order._id}}/parcels">
-                            <i class="weui-icon-edit"></i>
-                        </a>
-                    </div>
-                    {{/ifeq}}
                 </div>
                 <div class="weui-media-box weui-media-box_appmsg">
                     <div class="weui-media-box__bd">
                         <h4 class="weui-media-box__title">地址</h4>
-                        {{#if order.address}}
-                        <p class="weui-media-box__desc">{{order.address.street}}</p>
-                        <p class="weui-media-box__desc">{{order.address.city}}, QC, Canada</p>
-                        <p class="weui-media-box__desc">{{order.address.postal}}</p>
+                        {{#if package.user.postal}}
+                        <p class="weui-media-box__desc">{{package.user.street}}</p>
+                        <p class="weui-media-box__desc">{{package.user.city}}, QC, Canada</p>
+                        <p class="weui-media-box__desc">{{package.user.postal}}</p>
                         {{/if}}
-                        {{#unless order.address}}
+                        {{#unless package.user.postal}}
                         <p class="weui-media-box__desc">没有提供地址</p>
                         {{/unless}}
                     </div>
-                    <a href="/order/{{order._id}}/address">
+                    <!--<a href="/package/{{package._id}}/address">
                         <i class="weui-icon-edit"></i>
-                    </a>
+                    </a>-->
                 </div>
                 <a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg">
                     <div class="weui-media-box__bd">
@@ -99,14 +92,14 @@
                 </a>
             </div>
             <div class="weui-panel__ft">
-                <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link">
+                <a href="/user/packages" class="weui-cell weui-cell_access weui-cell_link">
                     <div class="weui-cell__bd">查看更多</div>
                     <span class="weui-cell__ft"></span>
                 </a>    
             </div>
             {{/if}}
-            {{#unless order}}
-            <h4>没有找到订单</h4>
+            {{#unless package}}
+            <h4>没有找到拼箱</h4>
             {{/unless}}
         </div>
     </div>

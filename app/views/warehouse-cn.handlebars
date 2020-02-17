@@ -1,5 +1,8 @@
 {{#section 'style'}}
 <style>
+    .weui-cell__bd {
+        margin-right: 10px;
+    }
     .weui-cells_form .weui-cell__ft {
         text-align: center;
         font-size: 20px;
@@ -27,9 +30,9 @@
     </div>
     <div class="weui-form__control-area">
         <div class="weui-cells__group weui-cells__group_form">
-            <div class="weui-cells weui-cells_form parcel-list" {{#if orderId}}data-id="{{orderId}}"{{/if}}>
+            <div class="weui-cells weui-cells_form parcel-list">
                 {{#each parcels}}
-                    <div class="weui-cell parcel-unit" data-id="{{_id}}">
+                    <div class="weui-cell parcel-unit" data-id="{{_id}}" data-pid="{{package}}">
                         
                         <div class="weui-cell__bd">
                             <input class="weui-input parcel-series" placeholder="填写单号" value="{{series}}" onkeyup="keyupFunc(this)" disabled>
@@ -185,13 +188,14 @@
     function deleteFunc(el) {
         var $parcel_unit = $(el).closest('.parcel-unit');
         var id = $parcel_unit.data('id');
-        if (!id) return;
+        var pid = $parcel_unit.data('pid');
+        if (!id || !pid) return;
         
         $dialog.fadeIn(200).find('.parcelId').text($parcel_unit.find('.parcel-series').val()); 
         $dialog.on('click', '.weui-dialog__btn', function(){
             $dialog.fadeOut(200);
             $dialog.off('click', '.weui-dialog__btn', null);
-            var data = {user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc'};
+            var data = {user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc', 'pid': pid};
             if ($(this).hasClass('confirm-delete')) {
                 $.ajax({
                     type: "POST",

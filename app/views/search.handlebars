@@ -71,16 +71,16 @@
                 $searchResult.empty();
                 if(this.value.length) {
 
-                    var orderId = this.value;
+                    var packageId = this.value;
                     $.ajax({
                         type: "GET",
                         dataType: 'json',
-                        url: '/api/order/' + orderId,
+                        url: '/api/package/' + packageId,
                         success: function(res) {
                             if (res && res.length) {
-                                res.forEach(function(order) {
-                                    var orderDiv = $('<a class="weui-cell" href="/order/' + order._id +'">' + order._id + '</a>');
-                                    $searchResult.append(orderDiv);
+                                res.forEach(function(package) {
+                                    var packageDiv = $('<a class="weui-cell" href="/package/' + package._id +'">' + package._id + '</a>');
+                                    $searchResult.append(packageDiv);
                                 });
                             } else {
                                 $searchResult.append($('<a class="weui-cell">没找到相应的订单</a>'));

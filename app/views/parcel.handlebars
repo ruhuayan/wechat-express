@@ -15,6 +15,15 @@
         color: var(--link-color);
         font-size: 20px;
     }
+    .weui-cell__bd {
+        padding-right: 10px;
+    }
+    .package {
+        position: absolute;
+        font-size: 10px;
+        left: 20px;
+        bottom: 0;
+    }
     .weui-toast1 {
         width: 90%;
         position: fixed;
@@ -40,9 +49,11 @@
                     <div class="weui-cell parcel-unit" data-id="{{_id}}">
                         
                         <div class="weui-cell__bd">
-                            <input class="weui-input parcel-series" placeholder="填写单号" value="{{series}}" onkeyup="keyupFunc(this)" disabled>
+                            <input class="weui-input parcel-series" placeholder="填写包裹号" value="{{series}}" onkeyup="keyupFunc(this)" disabled>
                         </div>
-                        <div class="weui-cell__ft">
+                        <div class="weui-cell__ft"> 
+                            {{#ifeq status '收到'}} <span>{{status}} </span><span class="package">箱号：{{package}}</span>{{/ifeq}}
+                            {{#uneq status '收到'}}
                             <a class="edit-parcel" onclick="editFunc(this)">
                                 <i class="weui-icon-edit"></i>
                             </a>
@@ -55,12 +66,13 @@
                             <a class="cancel-edit display-none" onclick="cancelFunc(this)">
                                 <i class="weui-icon-cancel"></i>
                             </a>
+                            {{/uneq}}
                         </div>
                     </div>
                 {{/each}}
                 <div class="weui-cell parcel-unit"> 
                     <div class="weui-cell__bd">
-                        <input class="weui-input parcel-series" placeholder="填写单号" onkeyup="keyupFunc(this)" >
+                        <input class="weui-input parcel-series" placeholder="填写包裹号" onkeyup="keyupFunc(this)" >
                         {{!-- <input class="weui-input parcel-desc" placeholder="简单描述"> --}}
                     </div>
                     <div class="weui-cell__ft">
@@ -88,8 +100,8 @@
         </div>
     </div>
     <div class="weui-panel__ft">
-        <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link">
-            <div class="weui-cell__bd">查看你的拼箱</div>
+        <a href="/user/parcels" class="weui-cell weui-cell_access weui-cell_link">
+            <div class="weui-cell__bd">查看所有包裹</div>
             <span class="weui-cell__ft"></span>
         </a>    
     </div>

@@ -1,7 +1,7 @@
 const PackageStatus = Object.freeze(
     {
         Confirm: '确认',
-        InWarehouseCN: '进中国仓',
+        // InWarehouseCN: '进中国仓',
         InCustomCN: '中国海关',
         Shipping: '运输中',
         InCustomCA: '加拿大海关',
@@ -14,7 +14,6 @@ const PackageStatus = Object.freeze(
 const ParcelStatus = Object.freeze(
     {
         Create: '创建',
-        Confirm: '确认',
         Received: '收到',
         Packed: '已装箱',
         Shipping: '运输中',

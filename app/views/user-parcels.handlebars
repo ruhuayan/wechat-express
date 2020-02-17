@@ -7,25 +7,19 @@
         <div class="weui-panel_access">
             <div class="weui-panel__hd">用户 ID：{{userId}}</div>
             <div class="weui-panel__bd">
-                {{#each orders}}
-                <a class="weui-media-box weui-media-box_appmsg" href="/order/{{_id}}">
+                {{#each parcels}}
+                <a class="weui-media-box weui-media-box_appmsg" href="/package/{{_id}}">
                     <div class="weui-media-box__bd">
-                        <h4 class="weui-media-box__title">订单： {{_id}}</h4>
+                        <h4 class="weui-media-box__title">包裹号： {{series}}</h4>
                         <p class="weui-media-box__desc">状态： {{status}}</p>
                     </div>
                 </a>
                 {{/each}}
-                {{#unless orders}}
+                {{#unless parcels}}
                 <div class="weui-cell">
-                    <p class="weui-media-box__desc">没有订单</p>
+                    <p class="weui-media-box__desc">没有包裹</p>
                 </div>
                 {{/unless}}
-            </div>
-            <div class="weui-panel__ft">
-                <a href="/user/profile" class="weui-cell weui-cell_access weui-cell_link">
-                    <div class="weui-cell__bd">个人信息</div>
-                    <span class="weui-cell__ft"></span>
-                </a>    
             </div>
         </div>
     </div>

@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
 const Package = mongoose.model('Package');
-const Address = mongoose.model('Address');
+const Parcel = mongoose.model('Parcel');
 const router = express.Router();
 const jssdk = require('../libs/jssdk');
 
@@ -20,13 +20,24 @@ router.use((req, res, next) => {
     });
 });
 
-router.get('/orders', (req, res, next) => {
+router.get('/packages', (req, res, next) => {
 
-    Package.find({ user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc' }).exec(function (err, orders) {
-        res.render('user-orders', {
+    Package.find({ user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc' }).exec(function (err, packages) {
+        res.render('user-packages', {
             title: '用户订单',
             signPackage: JSON.stringify(req.signPackage),
-            orders,
+            packages,
+            userId: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc'
+        });
+    });
+});
+
+router.get('/parcels', (req, res, next) => {
+    Parcel.find({ user: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc' }).exec(function (err, parcels) {
+        res.render('user-parcels', {
+            title: '用户包裹',
+            signPackage: JSON.stringify(req.signPackage),
+            parcels,
             userId: 'oCXVSt-WnhdRwjsZbyFUG_GN1BXc'
         });
     });
