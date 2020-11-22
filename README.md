@@ -21,11 +21,11 @@ Wechat Admin Console： https://mp.weixin.qq.com/
 ## if you have nodejs higher than 11.15
 
 npm install -g n\
-sudo n 11.15.0\
+sudo n 11.15.0
 
 npm install gulp@^3.9.1\
 npm install \
-npm rebuild node-sass\
+npm rebuild node-sass
 
 ## SETUP
 create .env and setup the following three values from https://mp.weixin.qq.com/
