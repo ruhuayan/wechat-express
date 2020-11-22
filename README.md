@@ -1,21 +1,37 @@
-# 微信JS
+# 微信账号公众账号 信息推送 JS
 
-使用JS开发微信内嵌网页，Node开发微信公众账号服务端。
-Nodejs + MongoDB + Express
+使用JS开发微信内嵌网页，Node开发微信公众账号服务端， 用于 海运货物 流程中 信息推送 及 处理各种客户信息 自动 回复 。\
+Nodejs + MongoDB + Express \
+Wechat Admin Console： https://mp.weixin.qq.com/
 
+## WeChat Official Account
+WeChat Official Account (also known as “OA”) is a China-based marketing platform that acts as a complete brand hub to:
+
+* Gather followers
+* Send them targeted content
+* Push them marketing and service notifications
+* Redirect them to a website/e-commerce
+
+WeChat Official Account back-end login URL：\
+Wechat Admin Console： https://mp.weixin.qq.com/
 ## TEST
 
 * gulp
 
 ## if you have nodejs higher than 11.15
 
-npm install -g n
-sudo n 11.15.0
+npm install -g n\
+sudo n 11.15.0\
 
-npm install gulp@^3.9.1
-npm install 
-npm rebuild node-sass
+npm install gulp@^3.9.1\
+npm install \
+npm rebuild node-sass\
 
+## SETUP
+create .env and setup the following three values from https://mp.weixin.qq.com/
+APPID=xxxxx\
+APPSECRET=xxxxxx\
+TOKEN=xxxxxxx\
 ## 微信开发 - config:fail,invalid signature
 首先,JS域名设置的只能是有域名,不能带http://
 
