@@ -31,7 +31,7 @@ npm rebuild node-sass
 create .env and setup the following three values from https://mp.weixin.qq.com/
 APPID=xxxxx\
 APPSECRET=xxxxxx\
-TOKEN=xxxxxxx\
+TOKEN=xxxxxxx
 ## 微信开发 - config:fail,invalid signature
 首先,JS域名设置的只能是有域名,不能带http://
 
