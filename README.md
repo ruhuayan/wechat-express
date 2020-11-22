@@ -10,6 +10,7 @@ WeChat Official Account back-end login URL：\
 Wechat Admin Console： https://mp.weixin.qq.com/
 
 # 微信账号公众账号 信息推送 JS
+Wechat Officials Account message manangement JS
 
 使用JS开发微信内嵌网页，Node开发微信公众账号服务端， 用于 海运货物 流程中 信息推送 及 处理各种客户信息 自动 回复 。\
 Nodejs + MongoDB + Express \
@@ -33,7 +34,7 @@ create .env and setup the following three values from https://mp.weixin.qq.com/\
 APPID=xxxxx\
 APPSECRET=xxxxxx\
 TOKEN=xxxxxxx
-## 微信开发 - config:fail,invalid signature
+## 微信开发常遇到的问题 - config:fail,invalid signature
 首先,JS域名设置的只能是有域名,不能带http://
 
 其次
